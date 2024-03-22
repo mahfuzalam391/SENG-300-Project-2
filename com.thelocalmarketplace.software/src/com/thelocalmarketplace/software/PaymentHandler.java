@@ -511,7 +511,20 @@ public class PaymentHandler {
 			}
 		}
 	}
-
+	
+	
+	/**
+	 * Processes a credit card payment via swipe.
+	 *
+	 * @param card         The credit card to be used for payment.
+	 * @param amountCharged The amount to be charged to the credit card.
+	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
+	 * @throws IOException          If an I/O error occurs.
+	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
+	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
+	 * @throws EmptyDevice          If the checkout station device is empty.
+	 * @throws OverloadedDevice     If the checkout station device is overloaded.
+	 */
 	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 		AbstractCardReader cardReader;
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
@@ -543,8 +556,57 @@ public class PaymentHandler {
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
 		printReceiptForCustomer(order); // Print the reciept.
 
+	}
+	
+	
+	/**
+	 * Processes a debit card payment via swipe.
+	 *
+	 * @param card         The debit card to be used for payment.
+	 * @param amountCharged The amount to be charged to the debit card.
+	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
+	 * @throws IOException          If an I/O error occurs.
+	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
+	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
+	 * @throws EmptyDevice          If the checkout station device is empty.
+	 * @throws OverloadedDevice     If the checkout station device is overloaded.
+	 */
+	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+		
+		AbstractCardReader cardReader;
+		
+		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
+			cardReader = new CardReaderBronze();
+		}
+		else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
+			cardReader = new CardReaderSilver();
+		}
+		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
+			cardReader = new CardReaderGold();
+		} else {
+			// WRITE AN ERROR FIGURE IT OUT LATER
+			return;
+		}
+		
+		CardData data = cardReader.swipe(card);
+		Scanner input = new Scanner(System.in);
+		System.out.println("Please Enter Signature:");
+		String signature = input.nextLine();
+		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
+		if (holdNumber == -1) {
+			// HOLD FAILED
+			return;
+		}
+		boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
+		if (!transaction) {
+			// TRANSACTION FAILED
+			return;
+		}
+		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+		printReceiptForCustomer(order); // Print the reciept.
 
 	}
+	
 
 
 }
