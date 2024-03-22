@@ -210,6 +210,9 @@ public class Order {
 				displayOrder(); // Displays the order to the customer after removal
 			}
 		}
+		
+		// check for weight discrepancy, then unlock the station
+		checkForDiscrepancy();
 	}
 
 	public void displayOrder(){
