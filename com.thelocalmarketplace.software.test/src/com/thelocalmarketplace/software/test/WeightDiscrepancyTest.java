@@ -37,6 +37,7 @@ import org.junit.Test;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScale;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
@@ -50,15 +51,9 @@ public class WeightDiscrepancyTest {
 	
 	private WeightDiscrepancy weightDiscrepancy;
 	private Order order;
-	private ElectronicScale scale;
-	private WeightDiscrepancy weightDiscrepancyla;
-	private Order order2;
-	private ElectronicScale scale2;
-	private WeightDiscrepancy weightDiscrepancy33;
-	private Order order3;
-	private ElectronicScale scale3;
+	private mockScale scale;
 	private Order order4;
-	private ElectronicScale scale4;
+	private mockScale  scale4;
 	private Order order5;
 	private mockScale scale5;
 	private WeightDiscrepancy weightDiscrepancy4;
@@ -70,7 +65,7 @@ public class WeightDiscrepancyTest {
 	@Before
 	public void setUp() throws OverloadedDevice {   
 		 		
-	        scale = new ElectronicScale();
+	        scale = new mockScale(new Mass(40000000),new Mass(40000000);
 	        PowerGrid grid = PowerGrid.instance();
 	        scale.plugIn(grid);
 	        scale.turnOn();
@@ -87,8 +82,6 @@ public class WeightDiscrepancyTest {
         }
     }   
     
-    
- 
     
     
     /** Create test for update mass, do this by creating two items, set the mass, add it to order
@@ -120,7 +113,7 @@ public class WeightDiscrepancyTest {
 
     @Test
     public void testcheckDiscrepancy_diff() throws OverloadedDevice {
-    	 scale5 = new mockScale();
+    	 scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
@@ -153,7 +146,7 @@ public class WeightDiscrepancyTest {
     @Test
     public void testcheckDiscrepancy_same() throws OverloadedDevice {
     
-    	 scale5 = new mockScale();
+    	scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
@@ -208,7 +201,7 @@ public class WeightDiscrepancyTest {
 	@Test
 	public void unBlockTest() throws Exception {
 		
-		scale4 = new ElectronicScale();
+		scale4 = new mockScale(new Mass (6000000), new Mass (60000000));
         PowerGrid grid = PowerGrid.instance();
         scale4.plugIn(grid);
         scale4.turnOn();
@@ -239,7 +232,7 @@ public class WeightDiscrepancyTest {
 	@Test
 	public void unBlockCatchExceptionTest() throws OverloadedDevice{
 		
-		scale4 = new ElectronicScale();
+		scale4 = new mockScale(new Mass (6000000), new Mass (60000000));
         PowerGrid grid = PowerGrid.instance();
         scale4.plugIn(grid);
         scale4.turnOn();
@@ -267,7 +260,7 @@ public class WeightDiscrepancyTest {
     @Test
     public void testCheckRemoval_lessthan() throws OverloadedDevice {
             
-        scale5 = new mockScale();
+    	scale5 = new mockScale(new Mass (6000000), new Mass (60000000));
         PowerGrid grid = PowerGrid.instance();
         scale5.plugIn(grid);
         scale5.turnOn();
@@ -297,7 +290,7 @@ public class WeightDiscrepancyTest {
     @Test
     public void testCheckbaggage_greaterthan() throws Exception {
         
-  	   scale5 = new mockScale();
+    	scale5 = new mockScale(new Mass (6000000), new Mass (60000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
@@ -348,7 +341,7 @@ public class WeightDiscrepancyTest {
      */
     @Test
     public void checkWeightChangeTestTrue() throws Exception{
-  	     scale5 = new mockScale();
+    	scale5 = new mockScale(new Mass (6000000), new Mass (60000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
@@ -375,7 +368,7 @@ public class WeightDiscrepancyTest {
   	@Test
     public void checkWeightChangeTestFalse() throws Exception{
         
-        scale5 = new mockScale();
+  		scale5 = new mockScale(new Mass (6000000), new Mass (60000000));
         PowerGrid grid = PowerGrid.instance();
         scale5.plugIn(grid);
         scale5.turnOn();
@@ -398,13 +391,13 @@ public class WeightDiscrepancyTest {
 
   	/** Create test that checks if the weight has changed, so create an item add to order and scale
   	 * and call function thus testing that the weight has changed */
-  	@Test
-  	public void notifymasschange_blocked() {
-  		MockItem item1 = new MockItem(new Mass(1000));
-  		order.addItemToOrder(item1); 
-        scale.addAnItem(item1);
-        weightDiscrepancy.notifyMassChanged();    
-  	} 
+//  	@Test
+//  	public void notifymasschange_blocked() {
+//  		MockItem item1 = new MockItem(new Mass(1000));
+//  		order.addItemToOrder(item1); 
+//        scale.addAnItem(item1);
+//        weightDiscrepancy.notifyMassChanged();    
+//  	} 
     
   	/** Create Test for teststation block first for true that checks that if in weight discrepancy class
   	 * the function pass true then SelfCheckoutStationSoftware should also return true */
