@@ -25,6 +25,8 @@
 package com.thelocalmarketplace.software;
 
 import java.util.ArrayList;
+import java.util.Scanner;
+
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
@@ -139,6 +141,45 @@ public class Order {
 		WeightDiscrepancy weightDiscrepancy = new WeightDiscrepancy(this, scale);
 
 		weightDiscrepancy.checkIfCanUnblock(); // Checks for a weight discrepancy, if none, it unblocks the system
+	}
+
+
+
+	/**
+	 * Signals that a specific item is to be removed from the order
+	 */
+	public void signalToRemoveItemFromOrder() {
+		// Signals to the customer which item they want to remove from the order
+		System.out.println("Please select the item you want to remove from the order.");
+
+		displayOrder(); // Displays the order to the customer
+
+		Scanner scanner = new Scanner(System.in);
+		String itemToRemove = scanner.nextLine();
+
+
+		// remove the item from the order
+		removeItemFromOrder(order.get(Integer.parseInt(itemToRemove) - 1));
+
+		Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
+		BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+
+		// Signals to the customer that the item has been removed from the order
+		System.out.println("Item " + productRemoved.getDescription() + " has been removed from the order.");
+
+		displayOrder(); // Displays the order to the customer after removal
+
+	}
+
+	public void displayOrder(){
+		// list the items in order
+		for (int i = 1; i <= order.size(); i++) {
+			Barcode barcode = ((BarcodedItem) order.get(i)).getBarcode();
+
+			BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+			System.out.println(i + ". " + "(What is this " + order.get(i).toString() + ") " + product.getDescription() + " " + product.getPrice() + " " + product.getExpectedWeight());
+		}
+		System.out.println("Total price: " + getTotalPrice() + " Total weight: " + getTotalWeightInGrams());
 	}
 	
 }
