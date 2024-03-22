@@ -111,7 +111,7 @@ public class AddOwnBag {
 				System.out.println("Bags too heavy, not allowed");
 				WeightDiscrepancy.setStationBlock(true); //block b/c to heavy 
 				//call attendant 
-				mockAttendant attend = new mockAttendant();
+				mockAttendant attend = new mockAttendant(order,scale,weight_of_bag);
 				attend.notifyAttendant();
 			
 				
@@ -129,6 +129,10 @@ public class AddOwnBag {
 		}
 
 		
+	}
+	
+	public void print_mess() {
+		System.out.print("You may now continue");
 	}
 		
 		
