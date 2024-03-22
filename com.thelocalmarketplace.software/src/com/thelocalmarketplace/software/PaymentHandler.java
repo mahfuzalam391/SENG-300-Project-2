@@ -51,6 +51,7 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteInsertionSlot;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
@@ -190,6 +191,76 @@ public class PaymentHandler {
 			return false; // Return false if the total value of valid coins is less than the total cost.
 
 		this.amountSpent = this.totalCost;
+
+		// Return true if accurate change is dispensed.
+		if (value.compareTo(this.totalCost) > 0) {
+			BigDecimal changeValue = value.subtract(this.totalCost);
+			return dispenseAccurateChange(changeValue);
+		}
+		return true;
+	}
+	
+	/**
+	 * Processes payment using coins inserted by the customer.
+	 *
+	 * @param coinsList List of coins inserted by the customer.
+	 * @return true if payment is successful, false otherwise.
+	 * @throws DisabledException        If the coin slot is disabled.
+	 * @throws CashOverloadException    If the cash storage is overloaded.
+	 * @throws NoCashAvailableException If no cash is available for dispensing
+	 *                                  change.
+	 * @throws OutOfInkException
+	 * @throws OutOfPaperException
+	 * @throws OverloadedDevice
+	 * @throws EmptyDevice
+	 */
+	public boolean processPaymentWithBanknotes(ArrayList<Banknote> BanknotesList)
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
+		
+		if (BanknotesList == null)
+			throw new NullPointerException("Banknotes cannot be null."); // Check for null parameters.
+
+		
+		BanknoteInsertionSlot insertionSlot = new BanknoteInsertionSlot() ;
+		
+		BigDecimal totalAmountOfBanknotes = new BigDecimal("0");
+		
+		
+		for (Banknote banknote : BanknotesList) { // Calculate the total value of coins inserted.
+			insertionSlot.receive(banknote);
+			
+			// totalAmountOfBanknotes = totalAmountOfBanknotes.add(banknote.getDenomination());
+			
+		}
+		
+		
+		
+
+
+		this.amountInserted = totalAmountOfBanknotes;
+		
+		
+		boolean isSuccess = false;
+		
+		
+		validator =
+		
+		for(Banknote banknote : BanknotesList) { // Accepts banknotes.
+			isSuccess = banknote.isValid();
+			if(!isSuccess) totalAmountOfBanknotes = totalAmountOfBanknotes.subtract(banknote.getDenomination()) ;
+			isSuccess = false;
+		}
+		
+		
+		this.changeRemaining = value.subtract(this.totalCost);
+
+
+		if (value.compareTo(this.totalCost) < 0)
+			return false; // Return false if the total value of valid coins is less than the total cost.
+
+
+		this.amountSpent = this.totalCost;
+
 
 		// Return true if accurate change is dispensed.
 		if (value.compareTo(this.totalCost) > 0) {
