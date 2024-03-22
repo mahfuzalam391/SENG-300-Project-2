@@ -56,7 +56,7 @@ public class WeightDiscrepancyTest {
 	private mockScale  scale4;
 	private Order order5;
 	private mockScale scale5;
-	private WeightDiscrepancy weightDiscrepancy4;
+	private WeightDiscrepancy weightDiscrepancy4; 
      
      
     /** Create before test for set up that initializes scale, order and weight Discrepancy
