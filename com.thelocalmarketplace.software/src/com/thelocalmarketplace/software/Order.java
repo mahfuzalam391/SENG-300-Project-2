@@ -126,6 +126,10 @@ public class Order {
 	public void addTotalWeightInGrams(double weight) {
 		this.totalWeight += weight;
 	}
+	public void removeTotalWeightInGrams(double weight) {
+		this.totalWeight -= weight;
+	}
+
 
 	/**
 	 * Updates the total price of the order
