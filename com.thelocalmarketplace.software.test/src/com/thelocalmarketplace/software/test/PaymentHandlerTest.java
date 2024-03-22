@@ -53,6 +53,7 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
@@ -73,6 +74,7 @@ public class PaymentHandlerTest {
 	private CheckoutStub checkoutStation;
     private ArrayList<Product> coinsList;
     private Coin coin1, coin2;
+    private Banknote banknote1, banknote2;
     private BigDecimal totalCost;
     private PaymentHandler paymentHandler;
     private BarcodedItem barcodedItem;
@@ -86,6 +88,8 @@ public class PaymentHandlerTest {
         // Mock SelfCheckoutStation and its components as needed
     	BigDecimal[] denominations = {new BigDecimal("0.25"),new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4")};
     	CheckoutStub.configureCoinDenominations(denominations);
+    	BigDecimal[] denominationsB = {new BigDecimal("1"),new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4")};
+    	CheckoutStub.configureCoinDenominations(denominationsB);
     	checkoutStation = new CheckoutStub();
         
         baggingArea = new ElectronicScaleBronze();
@@ -488,6 +492,91 @@ public class PaymentHandlerTest {
         assertFalse(paymentHandler.getStation().coinStorage.hasSpace());
         assertFalse(paymentHandler.acceptInsertedCoin(coin));
 
+    }
+    
+    
+    
+   
+    
+    
+    
+    // test process payment with banknote
+    
+    
+    @Test
+    public void processPaymentWithBanknotesTestWithOverpayment() throws Exception { 
+        // Simulate sufficient payment
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(10.00), BigDecimal.valueOf(20.00)};
+    	Currency currency = Currency.getInstance("CAD");
+
+    	// Load coins into dispenser
+    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
+    	// CheckoutStub.configureBanknoteDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+    	checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        paymentHandler.totalCost = new BigDecimal("15.00");
+        
+    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+    	
+    	banknote1 = new Banknote(currency,new BigDecimal("10.00"));
+        banknote2 = new Banknote(currency,new BigDecimal("20.00"));
+
+        notesList.add(banknote1);
+        notesList.add(banknote2);
+        
+        paymentHandler.loadBanknoteDispenser(
+        		new Banknote(currency, BigDecimal.valueOf(10.00)));
+        paymentHandler.loadBanknoteDispenser(
+        		new Banknote(currency, BigDecimal.valueOf(20.00)));
+        
+        assertTrue(paymentHandler.processPaymentWithBanknotes(notesList));
+    }
+    
+ 
+    @Test
+    public void processPaymentWithBanknotesTestWithUnderpayment() throws Exception {
+        // Simulate insufficient payment
+    	
+    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+    	Currency currency = Currency.getInstance("CAD");
+    	
+    	banknote1 = new Banknote(currency,new BigDecimal("1.00"));
+        banknote2 = new Banknote(currency,new BigDecimal("2.00"));
+
+        notesList.add(banknote1);
+        notesList.add(banknote2);
+        
+        checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        
+        assertFalse(paymentHandler.processPaymentWithBanknotes(notesList));
+    }
+    
+    
+    @Test
+    public void testProcessPaymentBanknotesWithExactAmount() throws Exception {
+    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+    	Currency currency = Currency.getInstance("CAD");
+    	
+    	banknote1 = new Banknote(currency,new BigDecimal("10.00"));
+        banknote2 = new Banknote(currency,new BigDecimal("2.00"));
+
+        notesList.add(banknote1);
+        notesList.add(banknote2);
+        
+        checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        
+        paymentHandler.totalCost = new BigDecimal("12.00");
+        
+        assertTrue("Payment should succeed with exact amount", paymentHandler.processPaymentWithBanknotes(notesList));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testProcessPaymentWithNullBanknotesList() throws Exception {
+        paymentHandler.processPaymentWithBanknotes(null); // This should throw NullPointerException
     }
 
 }

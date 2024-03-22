@@ -226,7 +226,7 @@ public class PaymentHandler {
 		//paid if not then return false ,s they will need to pay again 
 		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCostRemaining) < 0){
 			return false;
-		}// i need to return chanfge
+		}// i need to return change
 		
 		//if value is equal or greater then cost
 		// have to calculate the change value
@@ -493,7 +493,7 @@ public class PaymentHandler {
 	 * @throws CashOverloadException If the banknote dispensers are overloaded with
 	 *                               banknotes.
 	 */
-	public void loadBankNoteDispenser(Banknote ...banknotes) throws CashOverloadException {
+	public void loadBanknoteDispenser(Banknote ...banknotes) throws CashOverloadException {
 		if (banknotes == null) {
 			throw new NullPointerSimulationException("coins instance cannot be null.");
 		}
