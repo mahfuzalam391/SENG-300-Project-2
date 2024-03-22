@@ -40,6 +40,7 @@ import java.util.Currency;
 import java.util.List;
 
 import org.junit.Before;
+
 import org.junit.Test;
 
 import com.jjjwelectronics.EmptyDevice;
