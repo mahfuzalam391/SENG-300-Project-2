@@ -209,7 +209,7 @@ public class PaymentHandlerTest {
     }
 
     @Test
-    public void getChangeRemiaingTest() throws Exception {
+    public void getChangeRemainingTest() throws Exception {
         // Simulate exact payment
         assertEquals(paymentHandler.getChangeRemaining(), BigDecimal.ZERO);
     }
