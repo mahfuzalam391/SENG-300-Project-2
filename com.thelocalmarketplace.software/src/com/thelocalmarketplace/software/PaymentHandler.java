@@ -74,6 +74,7 @@ public class PaymentHandler {
 	public BigDecimal amountSpent;
 	public BigDecimal changeRemaining = BigDecimal.ZERO;
 	public BigDecimal totalCost = new BigDecimal(0);
+	public BigDecimal amountInserted;
 	private AbstractSelfCheckoutStation checkoutSystem = null;
 	private ArrayList<Item> allItemOrders;
 	private ReceiptPrinterBronze printerBronze;
