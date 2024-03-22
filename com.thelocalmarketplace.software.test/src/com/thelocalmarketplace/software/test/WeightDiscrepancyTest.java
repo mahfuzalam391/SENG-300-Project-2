@@ -61,11 +61,11 @@ public class WeightDiscrepancyTest {
      
     /** Create before test for set up that initializes scale, order and weight Discrepancy
      * @throws OverloadedDevice */
-	
+	 
 	@Before
 	public void setUp() throws OverloadedDevice {   
 		 		
-	        scale = new mockScale(new Mass(40000000),new Mass(40000000);
+	        scale = new mockScale(new Mass(40000000),new Mass(40000000));  
 	        PowerGrid grid = PowerGrid.instance();
 	        scale.plugIn(grid);
 	        scale.turnOn();
