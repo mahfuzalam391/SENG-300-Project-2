@@ -42,10 +42,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.OverloadedDevice;
-import com.jjjwelectronics.scale.ElectronicScale;
+import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
@@ -54,9 +55,9 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.hardware.SelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.PaymentHandler;
+import com.thelocalmarketplace.software.CheckoutStub;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.OutOfInkException;
 import com.thelocalmarketplace.software.OutOfPaperException;
@@ -66,25 +67,25 @@ import ca.ucalgary.seng300.simulation.SimulationException;
 import powerutility.PowerGrid;
 
 public class PaymentHandlerTest {
-	private SelfCheckoutStation checkoutStation;
+	private CheckoutStub checkoutStation;
     private ArrayList<Product> coinsList;
     private Coin coin1, coin2;
     private BigDecimal totalCost;
     private PaymentHandler paymentHandler;
     private BarcodedItem barcodedItem;
     private BarcodedProduct barcodedProduct;
-    private ElectronicScale baggingArea;
+    private ElectronicScaleBronze baggingArea;
     private Order testOrder;
     private PLUCodedProduct pluCodedProduct;
 
     @Before
-    public void setUp() throws OverloadedDevice {
+    public void setUp() throws OverloadedDevice, EmptyDevice {
         // Mock SelfCheckoutStation and its components as needed
     	BigDecimal[] denominations = {new BigDecimal("0.25"),new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4")};
-    	SelfCheckoutStation.configureCoinDenominations(denominations);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(denominations);
+    	checkoutStation = new CheckoutStub();
         
-        baggingArea = new ElectronicScale();
+        baggingArea = new ElectronicScaleBronze();
         // Initializing mock barcoded item
  		Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
  		Barcode barcode = new Barcode(barcodeDigits);
@@ -106,8 +107,8 @@ public class PaymentHandlerTest {
          
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
 
-        paymentHandler.coinStorage.connect(PowerGrid.instance());
-        paymentHandler.coinStorage.activate();
+        paymentHandler.getStation().coinStorage.connect(PowerGrid.instance());
+        paymentHandler.getStation().coinStorage.activate();
         PowerGrid.engageUninterruptiblePowerSource();
         PowerGrid.instance().forcePowerRestore();
     }
@@ -188,8 +189,9 @@ public class PaymentHandlerTest {
     }
  
     @Test(expected = NullPointerException.class)
-    public void constructor_NullStation_ThrowsException() throws OverloadedDevice {
-        new PaymentHandler(null, new Order(null));
+    public void constructor_NullStation_ThrowsException() throws OverloadedDevice, EmptyDevice {
+    	checkoutStation = null;
+    	new PaymentHandler(checkoutStation, new Order(null));
     }
 
     @Test
@@ -205,9 +207,9 @@ public class PaymentHandlerTest {
     	Currency currency = Currency.getInstance("CAD");
 
     	// Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(2);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
     	checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -283,8 +285,8 @@ public class PaymentHandlerTest {
         // Add coins to the coin storage unit before calling emptyCoinStorage()
     	Currency currency = Currency.getInstance("CAD");
         coin1 = new Coin(currency, new BigDecimal("1.00"));
-        paymentHandler.coinStorage.load(coin1);
-        paymentHandler.coinStorage.unload();
+        paymentHandler.getStation().coinStorage.load(coin1);
+        paymentHandler.getStation().coinStorage.unload();
     }
     
    /**
@@ -300,9 +302,9 @@ public class PaymentHandlerTest {
     	BigDecimal[] listOfCoins = {BigDecimal.valueOf(0.25), BigDecimal.valueOf(0.10)};
 
         // Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(2);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -315,9 +317,11 @@ public class PaymentHandlerTest {
     /**
      * Test for CashOverloadException
      * @throws CashOverloadException
+     * @throws OverloadedDevice 
+     * @throws EmptyDevice 
      */
     @Test (expected = CashOverloadException.class)
-    public void testLoadCoinDispenserOverload() throws CashOverloadException {
+    public void testLoadCoinDispenserOverload() throws CashOverloadException, EmptyDevice, OverloadedDevice {
     	Currency currency = Currency.getInstance("CAD");
     	// Prepare some coins
         Coin coin1 = new Coin(currency, BigDecimal.valueOf(0.10));
@@ -325,9 +329,9 @@ public class PaymentHandlerTest {
     	BigDecimal[] listOfCoins = {BigDecimal.valueOf(0.25), BigDecimal.valueOf(0.10)};
 
         // Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(2);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -340,19 +344,21 @@ public class PaymentHandlerTest {
     
     /**
      * Test for NullPointerException when there is no coindispenser for a specific denomination of a coin
+     * @throws OverloadedDevice 
+     * @throws EmptyDevice 
      * @throws NullPointerException
      */
     @Test (expected = NullPointerException.class)
-    public void testLoadCoinDispenserCoinDoesntExist() throws CashOverloadException {
+    public void testLoadCoinDispenserCoinDoesntExist() throws CashOverloadException, EmptyDevice, OverloadedDevice {
     	Currency currency = Currency.getInstance("CAD");
     	// Prepare some coins
         Coin coin1 = new Coin(currency, BigDecimal.valueOf(0.25));
     	BigDecimal[] listOfCoins = {BigDecimal.valueOf(0.10)};
 
         // Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(2);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -377,8 +383,9 @@ public class PaymentHandlerTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testConstructorNullStation() throws OverloadedDevice {
-        new PaymentHandler(null, new Order(null));
+    public void testConstructorNullStation() throws OverloadedDevice, EmptyDevice {
+    	checkoutStation = null;
+        new PaymentHandler(checkoutStation, new Order(null));
     }
 
     @Test
@@ -387,9 +394,9 @@ public class PaymentHandlerTest {
     	Currency currency = Currency.getInstance("CAD");
 
     	// Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(10);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(10);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -418,9 +425,9 @@ public class PaymentHandlerTest {
     	Currency currency = Currency.getInstance("CAD");
 
     	// Load coins into dispenser
-    	SelfCheckoutStation.configureCoinDenominations(listOfCoins);
-    	SelfCheckoutStation.configureCoinDispenserCapacity(10);
-    	checkoutStation = new SelfCheckoutStation();
+    	CheckoutStub.configureCoinDenominations(listOfCoins);
+    	CheckoutStub.configureCoinDispenserCapacity(10);
+    	checkoutStation = new CheckoutStub();
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -445,3 +452,4 @@ public class PaymentHandlerTest {
 
 }
     
+
