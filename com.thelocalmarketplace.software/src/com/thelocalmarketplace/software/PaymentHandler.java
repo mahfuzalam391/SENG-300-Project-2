@@ -76,7 +76,6 @@ public class PaymentHandler {
 	private AbstractSelfCheckoutStation checkoutSystem = null;
 	private ArrayList<Item> allItemOrders;
 	private ReceiptPrinterBronze printerBronze;
-	private ArrayList<Coin> coinsList;
 	private ArrayList<Banknote> banknotesList;
 
 	private Order order; // Represents the customer order
@@ -91,7 +90,6 @@ public class PaymentHandler {
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
@@ -106,7 +104,6 @@ public class PaymentHandler {
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
@@ -121,7 +118,6 @@ public class PaymentHandler {
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
@@ -136,7 +132,6 @@ public class PaymentHandler {
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;

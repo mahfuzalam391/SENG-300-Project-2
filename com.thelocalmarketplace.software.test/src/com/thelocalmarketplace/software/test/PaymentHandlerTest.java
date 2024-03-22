@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 
 import org.junit.Test;
@@ -51,6 +52,7 @@ import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
@@ -110,8 +112,19 @@ public class PaymentHandlerTest {
 
         paymentHandler.getStation().coinStorage.connect(PowerGrid.instance());
         paymentHandler.getStation().coinStorage.activate();
+        paymentHandler.getStation().coinSlot.connect(PowerGrid.instance());
+        paymentHandler.getStation().coinSlot.activate();
+        paymentHandler.getStation().coinValidator.connect(PowerGrid.instance());
+        paymentHandler.getStation().coinValidator.activate();
         PowerGrid.engageUninterruptiblePowerSource();
         PowerGrid.instance().forcePowerRestore();
+    }
+    
+    @After
+    public void teardown() {
+    	paymentHandler = null;
+    	checkoutStation = null;
+ 
     }
     
     @Test
@@ -449,6 +462,32 @@ public class PaymentHandlerTest {
         assertTrue(paymentHandler.dispenseAccurateChange(BigDecimal.valueOf(1.35)));
         assertEquals(0, checkoutStation.coinDispensers.get(BigDecimal.valueOf(0.25)).size());
         assertEquals(1, checkoutStation.coinDispensers.get(BigDecimal.valueOf(0.10)).size());
+    }
+    
+ // Tests whether valid coins will be inserted if the checkout station's storage unit has space
+    @Test
+    public void testInsertValidCoinsIfEnoughSpace() throws DisabledException, CashOverloadException {
+        System.out.println(paymentHandler.getStation().coinStorage.getCapacity());
+        Coin coin1 = new Coin(Currency.getInstance("CAD"), new BigDecimal("0.05"));
+        Coin coin2 = new Coin(Currency.getInstance("USD"), new BigDecimal("1.00"));
+        assertTrue(paymentHandler.getStation().coinStorage.hasSpace());
+        assertTrue(paymentHandler.acceptInsertedCoin(coin1));
+        assertTrue(paymentHandler.acceptInsertedCoin(coin2));
+
+    }
+
+    // Tests whether valid coins inserted into a checkout station with no space will disable the coin slot
+    @Test (expected = CashOverloadException.class)
+    public void testInsertValidCoinsIfNoSpace() throws DisabledException, CashOverloadException {
+        System.out.println(paymentHandler.getStation().coinStorage.getCapacity());
+        Coin coin = new Coin(Currency.getInstance("CAD"), new BigDecimal("0.05"));
+        assertTrue(paymentHandler.getStation().coinStorage.hasSpace());
+        for (int i = 0; i < 3000; i++) {
+            paymentHandler.acceptInsertedCoin(coin);
+        }
+        assertFalse(paymentHandler.getStation().coinStorage.hasSpace());
+        assertFalse(paymentHandler.acceptInsertedCoin(coin));
+
     }
 
 }
