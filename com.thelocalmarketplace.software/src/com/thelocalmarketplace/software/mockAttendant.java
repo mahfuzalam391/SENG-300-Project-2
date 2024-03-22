@@ -21,7 +21,6 @@ public class mockAttendant {
     }
 
     
-    
 
     public void notifyAttendant() {
         System.out.println("Attendant come here");

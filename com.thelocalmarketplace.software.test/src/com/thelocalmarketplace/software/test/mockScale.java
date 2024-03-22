@@ -94,4 +94,7 @@ public class mockScale extends AbstractElectronicScale {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void turnOn() {}
+	public void enable() {}
 }
