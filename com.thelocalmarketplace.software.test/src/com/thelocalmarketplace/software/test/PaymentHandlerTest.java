@@ -578,6 +578,112 @@ public class PaymentHandlerTest {
     public void testProcessPaymentWithNullBanknotesList() throws Exception {
         paymentHandler.processPaymentWithBanknotes(null); // This should throw NullPointerException
     }
+    
+    
+    
+    
+    
+    // test load banknote dispenser
+    
+    
+    
+    
+    
+    /**
+     * Checks if coins are actually loaded in the coin dispenser
+     * @throws CashOverloadException
+     */
+    @Test
+    public void testLoadBanknoteDispenser() throws CashOverloadException, EmptyDevice, OverloadedDevice {
+    	Currency currency = Currency.getInstance("CAD");
+    	// Prepare some coins
+        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(1.00));
+        Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00), BigDecimal.valueOf(5.00)};
+
+        // Load coins into dispenser
+    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
+    	// CheckoutStub.configureBanknoteDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+        checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+
+        paymentHandler.loadBanknoteDispenser(banknote1, banknote2);
+        assertTrue(checkoutStation.banknoteDispensers.get(BigDecimal.valueOf(1.00)).size() == 1);
+        assertTrue(checkoutStation.banknoteDispensers.get(BigDecimal.valueOf(5.00)).size() == 1);
+    }
+    
+    /**
+     * Test for CashOverloadException
+     * @throws CashOverloadException
+     * @throws OverloadedDevice 
+     * @throws EmptyDevice 
+     */
+    @Test (expected = CashOverloadException.class)
+    public void testLoadBanknoteDispenserOverload() throws CashOverloadException, EmptyDevice, OverloadedDevice {
+    	Currency currency = Currency.getInstance("CAD");
+    	// Prepare some coins
+        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(1.00));
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00)};
+
+        // Load coins into dispenser
+    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
+    	// CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+        checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+    
+        BigDecimal v = ((Banknote) banknote1).getDenomination();
+		int capacity = checkoutStation.banknoteDispensers.get(v).getCapacity();
+        for (int i = 0 ; i < capacity ; i++) {
+        	paymentHandler.loadBanknoteDispenser(banknote1);
+        }
+        //should throw overlaod error on this load
+		Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(1.00));
+		paymentHandler.loadBanknoteDispenser(banknote2);
+    }
+    
+    /**
+     * Test for NullPointerException when there is no coindispenser for a specific denomination of a coin
+     * @throws OverloadedDevice 
+     * @throws EmptyDevice 
+     * @throws NullPointerException
+     */
+    @Test (expected = NullPointerException.class)
+    public void testLoadBanknotesDispenserCoinDoesntExist() throws CashOverloadException, EmptyDevice, OverloadedDevice {
+    	Currency currency = Currency.getInstance("CAD");
+    	// Prepare some coins
+        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(5.00));
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00)};
+
+        // Load coins into dispenser
+    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
+    	// CheckoutStub.configureCoinDispenserCapacity(2);
+    	checkoutStation = new CheckoutStub();
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+        checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        //should throw error for not recognizing coin in dispenser
+        paymentHandler.loadBanknoteDispenser(banknote1);
+    }
+
+    @Test (expected = NullPointerSimulationException.class)
+    public void loadBanknoteDispenserTestWithNull() throws NullPointerSimulationException, CashOverloadException {
+        // Add coins to the coin storage unit before calling emptyCoinStorage()
+        paymentHandler.loadBanknoteDispenser(null);	
+    }
+    
+    @Test (expected = NullPointerSimulationException.class)
+    public void loadBanknoteDispenserTestWithNullCoin() throws NullPointerSimulationException, CashOverloadException {
+        // Add coins to the coin storage unit before calling emptyCoinStorage()
+    	Currency currency = Currency.getInstance("CAD");
+        Banknote banknote1 = new Banknote(currency, new BigDecimal("1.00"));
+        Banknote banknote2 = new Banknote(currency, new BigDecimal("5.00"));
+        Banknote banknote3 = null;
+        paymentHandler.loadBanknoteDispenser(banknote1, banknote2, banknote3);
+    }
 
 }
     
