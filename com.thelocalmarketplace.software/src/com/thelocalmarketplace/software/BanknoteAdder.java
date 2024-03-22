@@ -61,7 +61,7 @@ public class BanknoteAdder {
 		return false;
 	}
 	
-	public ArrayList<Banknote> getAcceptedCoinsList() {
+	public ArrayList<Banknote> getAcceptedBanknotesList() {
 		return banknoteList;
 	}
 	
