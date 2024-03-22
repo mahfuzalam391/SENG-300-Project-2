@@ -25,7 +25,7 @@
 package com.thelocalmarketplace.software;
 
 import ca.ucalgary.seng300.simulation.InvalidStateSimulationException;
-import static com.thelocalmarketplace.hardware.SelfCheckoutStation.resetConfigurationToDefaults;
+import static com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation.resetConfigurationToDefaults;
 import java.util.Scanner;
 
 /**
