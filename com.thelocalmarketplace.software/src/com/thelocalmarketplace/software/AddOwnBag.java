@@ -57,8 +57,8 @@ public class AddOwnBag {
 			public void theMassOnTheScaleHasChanged(IElectronicScale scale, Mass mass) {
 				// TODO Auto-generated method stub
 				
-				double bag_grams = getBagWeight(order, scale1);
-				addbagweight(order, scale1, bag_grams);
+				double bag_grams = getBagWeight(order, scale1); //get weight of customers bags in grams 
+				addbagweight(order, scale1, bag_grams); //try to account for bag weight to prevent discrepancy 
 				
 			}
 
@@ -75,6 +75,7 @@ public class AddOwnBag {
 			}
 			
 		};	
+		System.out.println("Add all your bags now");
 	}
 	
 	public double getBagWeight(Order order, AbstractElectronicScale scale) {  
@@ -105,12 +106,18 @@ public class AddOwnBag {
 		try {
 			//compare scale mass which bag mass to mass limit 
 			int compare_to_threshold = scale.getCurrentMassOnTheScale().compareTo(new Mass(threshold));
+			
 			if (compare_to_threshold>=0) {
+				System.out.println("Bags too heavy, not allowed");
 				WeightDiscrepancy.setStationBlock(true); //block b/c to heavy 
-			//if possible add notification to attendant
+				//call attendant 
+				mockAttendant attend = new mockAttendant();
+				attend.notifyAttendant();
+			
 				
 			}
 			else {
+				//bag weight is fine, add weight of bag to order, system unblocks
 				WeightDiscrepancy.setStationBlock(false);  // change to unblock and continue 
 				order.addTotalWeightInGrams(weight_of_bag);
 				System.out.println("You may now continue");
