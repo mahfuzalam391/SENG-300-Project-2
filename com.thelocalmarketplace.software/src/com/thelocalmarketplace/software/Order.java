@@ -137,6 +137,9 @@ public class Order {
 	public void addTotalPrice(long price) {
 		this.totalPrice += price;
 	}
+	public void removeTotalPrice(long price) {
+		this.totalPrice -= price;
+	}
 
 	/**
 	 * Adds an item to the order via barcode scan
