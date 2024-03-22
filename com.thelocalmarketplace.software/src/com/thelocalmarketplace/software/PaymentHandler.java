@@ -79,6 +79,8 @@ public class PaymentHandler {
 	private ArrayList<Item> allItemOrders;
 	private ReceiptPrinterBronze printerBronze;
 	private ArrayList<Banknote> banknotesList;
+	private BigDecimal valueOfAllAcceptedBanknotes = new BigDecimal("0");
+	public BigDecimal totalCostRemaining;
 
 	private Order order; // Represents the customer order
 	// Consider adapting the other methods to reflect this global variable.
@@ -201,75 +203,41 @@ public class PaymentHandler {
 		return true;
 	}
 	
-	/**
-	 * Processes payment using coins inserted by the customer.
-	 *
-	 * @param coinsList List of coins inserted by the customer.
-	 * @return true if payment is successful, false otherwise.
-	 * @throws DisabledException        If the coin slot is disabled.
-	 * @throws CashOverloadException    If the cash storage is overloaded.
-	 * @throws NoCashAvailableException If no cash is available for dispensing
-	 *                                  change.
-	 * @throws OutOfInkException
-	 * @throws OutOfPaperException
-	 * @throws OverloadedDevice
-	 * @throws EmptyDevice
-	 */
-	public boolean processPaymentWithBanknotes(ArrayList<Banknote> BanknotesList)
+	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
 			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
 		
-		if (BanknotesList == null)
-			throw new NullPointerException("Banknotes cannot be null."); // Check for null parameters.
-
-		
-		BanknoteInsertionSlot insertionSlot = new BanknoteInsertionSlot() ;
-		
-		BigDecimal totalAmountOfBanknotes = new BigDecimal("0");
+		// first check if parameter is null or not
+		if (Banknotes == null) {
+			throw new NullPointerException("Banknotes cannot be null.");
+		}
+		//moved instances of BanknoteValidator and BanknoteInsertion
 		
 		
-		for (Banknote banknote : BanknotesList) { // Calculate the total value of coins inserted.
-			insertionSlot.receive(banknote);
+		for (Banknote banknote : Banknotes) { // Calculate the total value of coins inserted.
 			
-			// totalAmountOfBanknotes = totalAmountOfBanknotes.add(banknote.getDenomination());
+			acceptInsertedBanknote(banknote);
+			valueOfAllAcceptedBanknotes = valueOfAllAcceptedBanknotes.add(banknote.getDenomination());
+
 			
 		}
 		
 		
+		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be 
+		//paid if not then return false ,s they will need to pay again 
+		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCostRemaining) < 0){
+			return false;
+		}// i need to return chanfge
 		
-
-
-		this.amountInserted = totalAmountOfBanknotes;
-		
-		
-		boolean isSuccess = false;
-		
-		
-		validator =
-		
-		for(Banknote banknote : BanknotesList) { // Accepts banknotes.
-			isSuccess = banknote.isValid();
-			if(!isSuccess) totalAmountOfBanknotes = totalAmountOfBanknotes.subtract(banknote.getDenomination()) ;
-			isSuccess = false;
+		//if value is equal or greater then cost
+		// have to calculate the change value
+		this.changeRemaining = valueOfAllAcceptedBanknotes.subtract(this.totalCostRemaining);
+		if(changeRemaining.compareTo(new BigDecimal(0)) > 0) {
+			return dispenseAccurateChange(changeRemaining);// needs to be made so it can also dispense banknotes
 		}
 		
-		
-		this.changeRemaining = value.subtract(this.totalCost);
-
-
-		if (value.compareTo(this.totalCost) < 0)
-			return false; // Return false if the total value of valid coins is less than the total cost.
-
-
-		this.amountSpent = this.totalCost;
-
-
-		// Return true if accurate change is dispensed.
-		if (value.compareTo(this.totalCost) > 0) {
-			BigDecimal changeValue = value.subtract(this.totalCost);
-			return dispenseAccurateChange(changeValue);
-		}
 		return true;
 	}
+	
 
 
 	/**
