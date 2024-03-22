@@ -204,7 +204,7 @@ public class PaymentHandler {
 	}
 	
 	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
-			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
 		
 		// first check if parameter is null or not
 		if (Banknotes == null) {
