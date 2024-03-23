@@ -51,6 +51,7 @@ public class AddOwnBagTest {
 	private AddOwnBag addOwnBag; //object under test 
 	private mockScale scale;
 	private Mass massLimit; 
+	private WeightDiscrepancy weightDiscrepancy;
 	
 
 	
@@ -66,14 +67,11 @@ public class AddOwnBagTest {
 		order = new Order(scale);  
 		massLimit = scale.getMassLimit();
 		addOwnBag = new AddOwnBag(order, scale); 
-		PowerGrid grid = PowerGrid.instance();
-        scale.plugIn(grid);
-        scale.turnOn();
-        scale.enable();
+		weightDiscrepancy = new WeightDiscrepancy(order, scale);
 	}
 
 	
-	/** MockItem class for use when adding a bag to an order. The bag added will be the Item
+	/** MockItem class for use when adding an item to the order. 
 	 * 
 	 */
 	class MockItem extends Item {
@@ -109,35 +107,25 @@ public class AddOwnBagTest {
 	
 	@Test 
 	public void testAddBagWeightOverThreshold() throws OverloadedDevice { 
-	Mass massLimit = new Mass(50000000);
-	//need to set the scale limit somehow 
-	mockScale scaleOverLimit = new mockScale(new Mass(60000000), new Mass(60000000));
-	AddOwnBag addOwnBag = new AddOwnBag(order, scaleOverLimit); 
-	double bagWeight = addOwnBag.getBagWeight(order, scaleOverLimit);
-	
-	addOwnBag.addbagweight(order, scaleOverLimit, bagWeight);
-	Assert.assertEquals(20000000, massLimit);
+	// scale is over the massLimit 
+	mockScale scaleOverLimit = new mockScale(new Mass(40000000), new Mass(40000000));
+	//adding a new item to push scale over limit 
+	scaleOverLimit.addAnItem(new MockItem(new Mass(45000000))); 
+	//adding bag (1 gram) to the over limit scale 
+	addOwnBag.addbagweight(order, scaleOverLimit, 1000000); 
 	assertTrue(SelfCheckoutStationSoftware.getStationBlock()); 
 	
 	}
 	
 	
-	
 	@Test
 	public void testAddBagWeightWithinThreshold() throws OverloadedDevice {
 		//BigDecimal threshholdLimit = new ; 
-		mockScale scaleInLimit = new mockScale(new Mass(40000000), new Mass(40000000));
-		AddOwnBag addOwnBag = new AddOwnBag(order, scaleInLimit); 
-		//addOwnbag.addbagweight(order, scaleInLimit, threshholdLimit);
-		
+		mockScale scaleInLimit = new mockScale(new Mass(30000000), new Mass(30000000));
+		scaleInLimit.addAnItem(new MockItem(new Mass(40000000)));  
+		addOwnBag.addbagweight(order, scaleInLimit, 10000000);
 	}
 }
-
-
-
-
-// Need to add java doc for each test 
-// test the attendant thing too 
 
 
 
