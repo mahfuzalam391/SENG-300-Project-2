@@ -22,11 +22,22 @@
  * Nami Marwah (UCID: 30178528)
  */
 
+
 package com.thelocalmarketplace.software;
 
+/**
+ * Custom exception class to represent the scenario where a printer runs out of paper.
+ * This exception is thrown when an attempt is made to print but there is no paper available.
+ */
+@SuppressWarnings("serial")
 public class OutOfPaperException extends Exception {
+
+    /**
+     * Constructs an OutOfPaperException with the specified detail message.
+     *
+     * @param paperErrorMessage a String containing the detail message
+     */
     public OutOfPaperException(String paperErrorMessage) {
         super(paperErrorMessage);
     }
-
 }

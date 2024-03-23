@@ -22,9 +22,21 @@
  * Nami Marwah (UCID: 30178528)
  */
 
+
 package com.thelocalmarketplace.software;
 
+/**
+ * Custom exception class to represent the scenario where a printer runs out of ink.
+ * This exception is thrown when an attempt is made to print but there is no ink available.
+ */
+@SuppressWarnings("serial")
 public class OutOfInkException extends Exception {
+
+    /**
+     * Constructs an OutOfInkException with the specified detail message.
+     *
+     * @param inkErrorMessage a String containing the detail message
+     */
     public OutOfInkException(String inkErrorMessage){
         super(inkErrorMessage);
     }

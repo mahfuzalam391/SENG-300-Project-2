@@ -33,14 +33,21 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import powerutility.NoPowerException;
+import powerutility.PowerGrid;
 
-public class mockScale extends ElectronicScale {
+public class mockScale extends AbstractElectronicScale {
+	protected mockScale(Mass limit, Mass sensitivityLimit) {
+		super(limit, sensitivityLimit);
+		// TODO Auto-generated constructor stub
+	}
+
 	private List<Item> items = new ArrayList<>();
     private Mass currentMass = Mass.ZERO;
     private Mass massLimit;
@@ -82,4 +89,12 @@ public class mockScale extends ElectronicScale {
     public Mass getCurrentMassOnTheScale() {
         return currentMass;
     }
+
+	public void plugIn(PowerGrid grid) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void turnOn() {}
+	public void enable() {}
 }
