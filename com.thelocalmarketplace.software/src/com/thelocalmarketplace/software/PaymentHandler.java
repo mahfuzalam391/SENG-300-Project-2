@@ -79,7 +79,7 @@ public class PaymentHandler {
 	private ReceiptPrinterBronze printerBronze;
 	private ArrayList<Banknote> banknotesList;
 	private BigDecimal valueOfAllAcceptedBanknotes = new BigDecimal("0");
-	public BigDecimal totalCostRemaining;
+	// public BigDecimal totalCostRemaining;
 
 	private Order order; // Represents the customer order
 	// Consider adapting the other methods to reflect this global variable.
@@ -91,6 +91,8 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
 		this.banknotesList = new ArrayList<Banknote>();
@@ -213,13 +215,13 @@ public class PaymentHandler {
 		
 		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be 
 		//paid if not then return false ,s they will need to pay again 
-		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCostRemaining) < 0){
+		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCost) < 0){
 			return false;
 		}// i need to return change
 		
 		//if value is equal or greater then cost
 		// have to calculate the change value
-		this.changeRemaining = valueOfAllAcceptedBanknotes.subtract(this.totalCostRemaining);
+		this.changeRemaining = valueOfAllAcceptedBanknotes.subtract(this.totalCost);
 		if(changeRemaining.compareTo(new BigDecimal(0)) > 0) {
 			return dispenseAccurateChange(changeRemaining);// needs to be made so it can also dispense banknotes
 		}
@@ -270,7 +272,7 @@ public class PaymentHandler {
 			for (BigDecimal bankNote : bankNoteDenominations) {
 				if (remainingAmount.compareTo(bankNote) >= 0 && checkoutSystem.banknoteDispensers.get(bankNote).size() > 0) {
 					checkoutSystem.banknoteDispensers.get(bankNote).emit();
-					this.checkoutSystem.banknoteOutput.removeDanglingBanknotes();
+					//this.checkoutSystem.banknoteOutput.removeDanglingBanknotes();
 					amountDispensed = amountDispensed.add(bankNote);
 					remainingAmount = remainingAmount.subtract(bankNote);
 					dispensed = true;

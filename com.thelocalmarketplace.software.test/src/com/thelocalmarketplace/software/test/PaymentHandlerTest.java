@@ -60,7 +60,9 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.PaymentHandler;
 import com.thelocalmarketplace.software.Order;
@@ -95,6 +97,9 @@ public class PaymentHandlerTest {
     	SelfCheckoutStationGold.configureCurrency(Currency.getInstance("CAD"));
     	checkoutStation = new SelfCheckoutStationGold();
 
+    	checkoutStation.plugIn(PowerGrid.instance());
+    	checkoutStation.turnOn();
+        
         baggingArea = new ElectronicScaleBronze();
         // Initializing mock barcoded item
  		Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
@@ -123,6 +128,9 @@ public class PaymentHandlerTest {
         paymentHandler.getStation().coinSlot.activate();
         paymentHandler.getStation().coinValidator.connect(PowerGrid.instance());
         paymentHandler.getStation().coinValidator.activate();
+        paymentHandler.getStation().coinValidator.activate();
+        
+        
         PowerGrid.engageUninterruptiblePowerSource();
         PowerGrid.instance().forcePowerRestore();
     }
@@ -133,6 +141,70 @@ public class PaymentHandlerTest {
     	checkoutStation = null;
  
     }
+    
+    // test initializing bronze and silver paymentHandler
+    @Test
+    public void testBronzeCheckout() throws EmptyDevice, OverloadedDevice {
+    	SelfCheckoutStationBronze checkoutStation = null;
+    	PaymentHandler paymentHandler = null;
+    	
+    	SelfCheckoutStationBronze.resetConfigurationToDefaults();
+    	BigDecimal[] coinDenominations = {new BigDecimal("0.25"),new BigDecimal("0.10"), new BigDecimal("0.50"), new BigDecimal("1.0")};
+    	SelfCheckoutStationBronze.configureCoinDenominations(coinDenominations);
+    	BigDecimal[] bankNoteDenominations = {new BigDecimal("5.0"),new BigDecimal("10.0"), new BigDecimal("20.0"), new BigDecimal("50.0")};
+    	SelfCheckoutStationBronze.configureBanknoteDenominations(bankNoteDenominations);
+    	SelfCheckoutStationBronze.configureCurrency(Currency.getInstance("CAD"));
+    	checkoutStation = new SelfCheckoutStationBronze();
+    	checkoutStation.plugIn(PowerGrid.instance());
+    	checkoutStation.turnOn();
+    	checkoutStation.printer.plugIn(PowerGrid.instance());
+    	checkoutStation.printer.turnOn();
+        PowerGrid.engageUninterruptiblePowerSource();
+        PowerGrid.instance().forcePowerRestore();
+        
+        
+    	
+    	paymentHandler = new PaymentHandler((SelfCheckoutStationBronze)checkoutStation, testOrder);
+    	assertFalse(paymentHandler == null);
+    }
+    
+    @Test
+    public void testSilverCheckout() throws EmptyDevice, OverloadedDevice {
+    	SelfCheckoutStationSilver checkoutStation = null;
+    	PaymentHandler paymentHandler = null;
+    	
+    	SelfCheckoutStationSilver.resetConfigurationToDefaults();
+    	BigDecimal[] coinDenominations = {new BigDecimal("0.25"),new BigDecimal("0.10"), new BigDecimal("0.50"), new BigDecimal("1.0")};
+    	SelfCheckoutStationSilver.configureCoinDenominations(coinDenominations);
+    	BigDecimal[] bankNoteDenominations = {new BigDecimal("5.0"),new BigDecimal("10.0"), new BigDecimal("20.0"), new BigDecimal("50.0")};
+    	SelfCheckoutStationSilver.configureBanknoteDenominations(bankNoteDenominations);
+    	SelfCheckoutStationSilver.configureCurrency(Currency.getInstance("CAD"));
+    	checkoutStation = new SelfCheckoutStationSilver();
+    	checkoutStation.plugIn(PowerGrid.instance());
+    	checkoutStation.turnOn();
+        PowerGrid.engageUninterruptiblePowerSource();
+        PowerGrid.instance().forcePowerRestore();
+    	
+    	paymentHandler = new PaymentHandler((SelfCheckoutStationSilver)checkoutStation, testOrder);
+    	assertFalse(paymentHandler == null);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testVoidCheckoutSilver() throws EmptyDevice, OverloadedDevice {
+    	SelfCheckoutStationSilver checkoutStation = null;
+    	PaymentHandler paymentHandler;
+
+    	paymentHandler = new PaymentHandler((SelfCheckoutStationSilver)checkoutStation, testOrder);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testVoidCheckoutBronze() throws EmptyDevice, OverloadedDevice {
+    	SelfCheckoutStationBronze checkoutStation = null;
+    	PaymentHandler paymentHandler;
+
+    	paymentHandler = new PaymentHandler((SelfCheckoutStationBronze)checkoutStation, testOrder);
+    }
+    
     
     @Test
     public void testReceiptPrinter() throws Exception{
@@ -500,11 +572,7 @@ public class PaymentHandlerTest {
 
     }
     
-    
-    
-   
-    
-    
+  
     
     // test process payment with banknote
     
@@ -694,7 +762,7 @@ public class PaymentHandlerTest {
         paymentHandler.loadBanknoteDispenser(null);	
     }
     
-    @Test (expected = NullPointerSimulationException.class)
+    @Test (expected = NullPointerException.class)
     public void loadBanknoteDispenserTestWithNullCoin() throws NullPointerSimulationException, CashOverloadException {
         // Add coins to the coin storage unit before calling emptyCoinStorage()
     	Currency currency = Currency.getInstance("CAD");
