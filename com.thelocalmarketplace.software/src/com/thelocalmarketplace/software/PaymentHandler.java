@@ -148,6 +148,26 @@ public class PaymentHandler {
 		this.order = order;
 	}
 
+	public PaymentHandler(AbstractSelfCheckoutStation station, Order order) throws EmptyDevice, OverloadedDevice {
+		if (station == null)
+			throw new NullPointerException("No argument may be null.");
+		if (station instanceof SelfCheckoutStationBronze)
+			this.checkoutSystem = (SelfCheckoutStationBronze) station;
+		else if (station instanceof SelfCheckoutStationSilver)
+			this.checkoutSystem = (SelfCheckoutStationSilver) station;
+		else if (station instanceof SelfCheckoutStationGold)
+			this.checkoutSystem = (SelfCheckoutStationGold) station;
+		this.allItemOrders = order.getOrder();
+		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
+		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
+		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
+		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
+
+		this.order = order;
+	}
+
 	public AbstractSelfCheckoutStation getStation() {
 		return checkoutSystem;
 	}
@@ -499,12 +519,10 @@ public class PaymentHandler {
 	 * @param amountCharged The amount to be charged to the credit card.
 	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
 	 * @throws IOException          If an I/O error occurs.
-	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
-	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
+	public int payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
 		try {
 			AbstractCardReader cardReader = null;
 
@@ -524,20 +542,21 @@ public class PaymentHandler {
 			if (holdNumber == -1) {
 				// HOLD FAILED
 				System.out.println("The hold on the card failed. Please try again.");
-				return;
+				return -1;
 			}
 			boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
 			if (!transaction) {
 				// TRANSACTION FAILED
 				cardIssuer.releaseHold(data.getNumber(), holdNumber); // Remove the hold.
 				System.out.println("The transaction failed. Please try again.");
-				return;
+				return -1;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-			// Reciept printing is handled inside the demo
+			// Receipt printing is handled inside the demo
+			return 1;
 		} catch (MagneticStripeFailureException msfe) {
 			System.out.println("Card Swipe failed, please try again!");
-			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
+			return -1;
 		}
 	}
 
@@ -549,12 +568,10 @@ public class PaymentHandler {
 	 * @param amountCharged The amount to be charged to the debit card.
 	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
 	 * @throws IOException          If an I/O error occurs.
-	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
-	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
+	public int payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
 		try {
 			AbstractCardReader cardReader = null;
 
@@ -574,20 +591,21 @@ public class PaymentHandler {
 			if (holdNumber == -1) {
 				// HOLD FAILED
 				System.out.println("The hold on the card failed. Please try again.");
-				return;
+				return -1;
 			}
 			boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
 			if (!transaction) {
 				// TRANSACTION FAILED
 				cardIssuer.releaseHold(data.getNumber(), holdNumber); // Remove the hold.
 				System.out.println("The transaction failed. Please try again.");
-				return;
+				return -1;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-			// Reciept printing is handled inside the demo
+			return 1;
+			// Receipt printing is handled inside the demo
 		} catch (MagneticStripeFailureException msfe) {
 			System.out.println("Card Swipe failed, please try again!");
-			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
+			return -1;
 		}
 	}
 }
