@@ -157,8 +157,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice
 	 */
 	public boolean processPaymentWithCoins(ArrayList<Coin> coinsList)
-			throws DisabledException, CashOverloadException, NoCashAvailableException, OutOfPaperException,
-			OutOfInkException, EmptyDevice, OverloadedDevice {
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
 		if (SelfCheckoutStationSoftware.getStationBlock()) {
 			System.out.println("Blocked. Please add your item to the bagging area.");
 			return false;
@@ -191,7 +190,7 @@ public class PaymentHandler {
 	}
 
 	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
-			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
 
 		if (SelfCheckoutStationSoftware.getStationBlock()) {
 			System.out.println("Blocked. Please add your item to the bagging area.");
@@ -230,8 +229,6 @@ public class PaymentHandler {
 		}
 	}
 
-
-
 	/**
 	 * Dispenses the correct amount of change to the customer and gives them the
 	 * choice to print a receipt.
@@ -250,8 +247,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice
 	 */
 	public boolean dispenseAccurateChange(BigDecimal changeValue)
-			throws DisabledException, CashOverloadException, NoCashAvailableException, OutOfPaperException,
-			OutOfInkException, EmptyDevice, OverloadedDevice {
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
 
 		BigDecimal amountDispensed = new BigDecimal("0.0");
 		BigDecimal remainingAmount = changeValue;
@@ -278,7 +274,7 @@ public class PaymentHandler {
 				remainingAmount = BigDecimal.ZERO;
 				break;
 			}
-
+			
 			boolean dispensed = false;
 			// Try using banknotes first
 			for (BigDecimal bankNote : bankNoteDenominations) {
@@ -305,8 +301,8 @@ public class PaymentHandler {
 					}
 				}
 			}
-
-			break;
+			if(!dispensed)
+				break;
 		}
 
 		return remainingAmount.compareTo(BigDecimal.ZERO) == 0;
@@ -337,19 +333,13 @@ public class PaymentHandler {
 	 * @throws DisabledException     If the coin slot is disabled.
 	 * @throws CashOverloadException If the cash storage is overloaded.
 	 */
-	public boolean acceptInsertedCoin(Coin coin) throws DisabledException, CashOverloadException {
-		if (this.checkoutSystem.coinStorage.hasSpace()) {
-			if (this.checkoutSystem.coinSlot.hasSpace()) {
-				this.checkoutSystem.coinValidator.receive(coin);
-				this.checkoutSystem.coinSlot.receive(coin);
-				return true;
-			} else {
-				this.checkoutSystem.coinTray.receive(coin);
-				return false;
-			}
-		} else {
-			this.checkoutSystem.coinTray.receive(coin);
-			return false;
+	public void acceptInsertedCoin(Coin coin) throws DisabledException, CashOverloadException {
+		if(this.checkoutSystem.coinStorage.hasSpace()) {
+			this.checkoutSystem.coinSlot.enable();
+			this.checkoutSystem.coinSlot.receive(coin);
+		}
+		else {
+			this.checkoutSystem.coinSlot.disable();
 		}
 	}
 
@@ -360,17 +350,17 @@ public class PaymentHandler {
 	 * @throws DisabledException if the banknote slot is disabled.
 	 * @throws CashOverloadException if the banknote storage is overloaded
 	 */
-	public boolean acceptInsertedBanknote(Banknote banknote) throws DisabledException, CashOverloadException {
-		if (this.checkoutSystem.banknoteStorage.hasSpace()) {
-			if(this.checkoutSystem.banknoteInput.hasSpace()) {
-				this.checkoutSystem.banknoteValidator.receive(banknote);
-				this.checkoutSystem.banknoteInput.receive(banknote);
-				return true;
-			}
+	public void acceptInsertedBanknote(Banknote banknote) throws DisabledException, CashOverloadException {
+		if(this.checkoutSystem.banknoteInput.hasDanglingBanknotes()) {
+			this.checkoutSystem.banknoteInput.removeDanglingBanknote();
 		}
-		//check this, as for coin it's coinTray
-		this.checkoutSystem.banknoteOutput.receive(banknote);;
-		return false;
+		if(this.checkoutSystem.banknoteStorage.hasSpace()) {
+			this.checkoutSystem.banknoteInput.enable();
+			this.checkoutSystem.banknoteInput.receive(banknote);
+		}
+		else {
+			this.checkoutSystem.banknoteInput.disable();
+		}
 	}
 
 	/**
@@ -379,9 +369,7 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice
 	 * @throws EmptyDevice
 	 */
-
-
-	public String receiptPrinter(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+	public String receiptPrinter(Order order) throws EmptyDevice, OverloadedDevice {
 
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
@@ -389,14 +377,12 @@ public class PaymentHandler {
 			String productDescription;
 			Item item = order.getOrder().get(i);
 
-
 			if (item instanceof BarcodedItem) { // Gets the product description and the price of a barcoded product
 				BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(((BarcodedItem) item).getBarcode());
 				productDescription = product.getDescription();
 				long price = product.getPrice();
 				receiptItems.add(productDescription + " $" + String.format("%.2f", (float)price));
 			}
-
 
 			else if (item instanceof PLUCodedItem) { // Gets the product description and the price of a product inputted
 				// through price-lookup (PLU)
@@ -408,8 +394,6 @@ public class PaymentHandler {
 			else {
 				throw new NullPointerException("This product is not a supported product, can not be registered for a price");
 			}
-
-
 		}
 
 		BigDecimal purchaseValue = totalCost;
@@ -421,16 +405,12 @@ public class PaymentHandler {
 		receiptItems.add("Paid: $" + String.format("%.2f", amountPaid));
 		receiptItems.add("Change: $" + String.format("%.2f", changeDue));
 
-
 		for (int i = 0; i < receiptItems.size(); i++) {
 			this.printerBronze.print('\n');
-
-
+			
 			for (int j = 0; j < receiptItems.get(i).length(); j++) {
 				this.printerBronze.print(receiptItems.get(i).charAt(j));
-
 			}
-
 		}
 
 		this.printerBronze.cutPaper();
@@ -503,7 +483,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
 		AbstractCardReader cardReader;
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
 			cardReader = new CardReaderBronze();
@@ -549,7 +529,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
 
 		AbstractCardReader cardReader;
 
@@ -584,7 +564,4 @@ public class PaymentHandler {
 //		printReceiptForCustomer(order); // Print the reciept.
 
 	}
-
-
 }
-
