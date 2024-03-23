@@ -511,23 +511,19 @@ public class PaymentHandlerTest {
     
     @Test
     public void processPaymentWithBanknotesTestWithOverpayment() throws Exception { 
-        // Simulate sufficient payment
-    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(10.00), BigDecimal.valueOf(20.00)};
+    	
     	Currency currency = Currency.getInstance("CAD");
 
-    	// Load coins into dispenser
-    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
-    	// CheckoutStub.configureBanknoteDispenserCapacity(2);
-    	checkoutStation = new CheckoutStub();
+
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
     	checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
-        paymentHandler.totalCost = new BigDecimal("15.00");
+        paymentHandler.totalCost = new BigDecimal("15.0");
         
     	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
     	
-    	banknote1 = new Banknote(currency,new BigDecimal("10.00"));
-        banknote2 = new Banknote(currency,new BigDecimal("20.00"));
+    	banknote1 = new Banknote(currency,new BigDecimal("10.0"));
+        banknote2 = new Banknote(currency,new BigDecimal("20.0"));
 
         notesList.add(banknote1);
         notesList.add(banknote2);
@@ -545,11 +541,18 @@ public class PaymentHandlerTest {
     public void processPaymentWithBanknotesTestWithUnderpayment() throws Exception {
         // Simulate insufficient payment
     	
-    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
     	Currency currency = Currency.getInstance("CAD");
+
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+    	checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        paymentHandler.totalCost = new BigDecimal("15.0");
     	
-    	banknote1 = new Banknote(currency,new BigDecimal("1.00"));
-        banknote2 = new Banknote(currency,new BigDecimal("2.00"));
+    	
+    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+    	
+    	banknote1 = new Banknote(currency,new BigDecimal("5.0"));
+        banknote2 = new Banknote(currency,new BigDecimal("5.0"));
 
         notesList.add(banknote1);
         notesList.add(banknote2);
@@ -563,19 +566,25 @@ public class PaymentHandlerTest {
     
     @Test
     public void testProcessPaymentBanknotesWithExactAmount() throws Exception {
-    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
-    	Currency currency = Currency.getInstance("CAD");
     	
-    	banknote1 = new Banknote(currency,new BigDecimal("10.00"));
-        banknote2 = new Banknote(currency,new BigDecimal("2.00"));
+    	Currency currency = Currency.getInstance("CAD");
+
+        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+    	checkoutStation.plugIn(PowerGrid.instance());
+        checkoutStation.turnOn();
+        paymentHandler.totalCost = new BigDecimal("15.0");
+    	
+    	ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+    	
+    	
+    	banknote1 = new Banknote(currency,new BigDecimal("10.0"));
+        banknote2 = new Banknote(currency,new BigDecimal("5.0"));
 
         notesList.add(banknote1);
         notesList.add(banknote2);
         
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
-        
-        paymentHandler.totalCost = new BigDecimal("12.00");
         
         assertTrue("Payment should succeed with exact amount", paymentHandler.processPaymentWithBanknotes(notesList));
     }
@@ -603,20 +612,21 @@ public class PaymentHandlerTest {
     public void testLoadBanknoteDispenser() throws CashOverloadException, EmptyDevice, OverloadedDevice {
     	Currency currency = Currency.getInstance("CAD");
     	// Prepare some coins
-        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(1.00));
-        Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
-    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00), BigDecimal.valueOf(5.00)};
+        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(5.00));
+        Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(10.00));
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(10.00), BigDecimal.valueOf(5.00)};
 
-        // Load coins into dispenser
-    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
-    	// CheckoutStub.configureBanknoteDispenserCapacity(2);
-    	checkoutStation = new CheckoutStub();
+    	SelfCheckoutStationGold.resetConfigurationToDefaults();
+    	SelfCheckoutStationGold.configureBanknoteDenominations(listOfNotes);
+    	SelfCheckoutStationGold.configureCurrency(Currency.getInstance("CAD"));
+    	checkoutStation = new SelfCheckoutStationGold();
+    	
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
 
         paymentHandler.loadBanknoteDispenser(banknote1, banknote2);
-        assertTrue(checkoutStation.banknoteDispensers.get(BigDecimal.valueOf(1.00)).size() == 1);
+        assertTrue(checkoutStation.banknoteDispensers.get(BigDecimal.valueOf(10.00)).size() == 1);
         assertTrue(checkoutStation.banknoteDispensers.get(BigDecimal.valueOf(5.00)).size() == 1);
     }
     
@@ -630,13 +640,15 @@ public class PaymentHandlerTest {
     public void testLoadBanknoteDispenserOverload() throws CashOverloadException, EmptyDevice, OverloadedDevice {
     	Currency currency = Currency.getInstance("CAD");
     	// Prepare some coins
-        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(1.00));
-    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00)};
+        Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(5.00));
+    	BigDecimal[] listOfNotes = {BigDecimal.valueOf(5.00)};
 
-        // Load coins into dispenser
-    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
-    	// CheckoutStub.configureCoinDispenserCapacity(2);
-    	checkoutStation = new CheckoutStub();
+    	
+    	SelfCheckoutStationGold.resetConfigurationToDefaults();
+    	SelfCheckoutStationGold.configureBanknoteDenominations(listOfNotes);
+    	SelfCheckoutStationGold.configureCurrency(Currency.getInstance("CAD"));
+    	checkoutStation = new SelfCheckoutStationGold();
+        
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -647,7 +659,7 @@ public class PaymentHandlerTest {
         	paymentHandler.loadBanknoteDispenser(banknote1);
         }
         //should throw overlaod error on this load
-		Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(1.00));
+		Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
 		paymentHandler.loadBanknoteDispenser(banknote2);
     }
     
@@ -664,10 +676,11 @@ public class PaymentHandlerTest {
         Banknote banknote1 = new Banknote(currency, BigDecimal.valueOf(5.00));
     	BigDecimal[] listOfNotes = {BigDecimal.valueOf(1.00)};
 
-        // Load coins into dispenser
-    	CheckoutStub.configureBanknoteDenominations(listOfNotes);
-    	// CheckoutStub.configureCoinDispenserCapacity(2);
-    	checkoutStation = new CheckoutStub();
+    	SelfCheckoutStationGold.resetConfigurationToDefaults();
+    	SelfCheckoutStationGold.configureBanknoteDenominations(listOfNotes);
+    	SelfCheckoutStationGold.configureCurrency(Currency.getInstance("CAD"));
+    	checkoutStation = new SelfCheckoutStationGold();
+    	
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         checkoutStation.plugIn(PowerGrid.instance());
         checkoutStation.turnOn();
@@ -685,8 +698,8 @@ public class PaymentHandlerTest {
     public void loadBanknoteDispenserTestWithNullCoin() throws NullPointerSimulationException, CashOverloadException {
         // Add coins to the coin storage unit before calling emptyCoinStorage()
     	Currency currency = Currency.getInstance("CAD");
-        Banknote banknote1 = new Banknote(currency, new BigDecimal("1.00"));
-        Banknote banknote2 = new Banknote(currency, new BigDecimal("5.00"));
+        Banknote banknote1 = new Banknote(currency, new BigDecimal("5.00"));
+        Banknote banknote2 = new Banknote(currency, new BigDecimal("10.00"));
         Banknote banknote3 = null;
         paymentHandler.loadBanknoteDispenser(banknote1, banknote2, banknote3);
     }
