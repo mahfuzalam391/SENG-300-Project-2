@@ -89,7 +89,7 @@ public class SelfCheckoutStationSoftware {
 		System.out.println("Welcome to The Local Marketplace. Touch anywhere to start.");
 		
 		// assume the user gives some kind of input.
-		 scanner.nextLine();
+		scanner.nextLine();
 
 		setStationActive(true); // Set the current session to active.
 

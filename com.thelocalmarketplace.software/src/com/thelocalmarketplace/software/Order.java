@@ -145,16 +145,21 @@ public class Order {
 	 * Adds an item to the order via barcode scan
 	 */
 	public void addItemViaBarcodeScan(Barcode barcode) {
-		// Get the product from the database
+		// Gets the product from the hardware's database
+		// All the barcodes are accepted from the bronze, silver and gold
 		BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
-		//To make sure the barcode scanned is available in the database
+		//Makes sure that the product that is recieved from the barcode 
+		// Is not null, therefore making sure it exists.
 		if (product != null) {
-			double productWeight = product.getExpectedWeight(); // Gets products weight from barcode
+			//Gets both the products weight and price
+			double productWeight = product.getExpectedWeight(); 
 			long productPrice = product.getPrice();
 
-			addTotalWeightInGrams(productWeight); // Adds the weight of the product to the total weight of the order
-			addTotalPrice(productPrice); // Adds the price of the product to the total price of the order
+			// Adds the weight and price of the product 
+			// Adding it to the total weight/price
+			addTotalWeightInGrams(productWeight); 
+			addTotalPrice(productPrice); 
 
 			mass = new Mass(productWeight); // Converts the weight of the product to a mass
 			barcodedItem = new BarcodedItem(barcode, mass); // Adds the product to the order
