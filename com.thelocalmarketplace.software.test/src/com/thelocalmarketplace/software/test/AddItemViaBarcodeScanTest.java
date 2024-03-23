@@ -273,14 +273,6 @@ public class AddItemViaBarcodeScanTest {
 		scanner.deregister(testBarcodeItemAdder);
 		baggingArea.deregister(testBaggingAreaListener);
 
-		// Disable, turn off and un-plug hardware objects
-		scanner.disable();
-		scanner.turnOff();
-		scanner.unplug();
-		baggingArea.disable();
-		baggingArea.turnOff();
-		baggingArea.unplug();
-
 		// Unblock the system
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
