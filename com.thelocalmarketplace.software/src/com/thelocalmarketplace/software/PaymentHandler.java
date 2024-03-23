@@ -514,6 +514,7 @@ public class PaymentHandler {
 				return;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			// Reciept printing is handled inside the demo
 		} catch (MagneticStripeFailureException msfe) {
 			System.out.println("Card Swipe failed, please try again!");
 			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
@@ -563,6 +564,7 @@ public class PaymentHandler {
 				return;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			// Reciept printing is handled inside the demo
 		} catch (MagneticStripeFailureException msfe) {
 			System.out.println("Card Swipe failed, please try again!");
 			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
