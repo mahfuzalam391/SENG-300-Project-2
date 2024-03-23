@@ -51,6 +51,7 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteInsertionSlot;
 import com.tdc.coin.Coin;
+import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
@@ -77,9 +78,6 @@ public class PaymentHandler {
 	private AbstractSelfCheckoutStation checkoutSystem = null;
 	private ArrayList<Item> allItemOrders;
 	private ReceiptPrinterBronze printerBronze;
-	private ArrayList<Banknote> banknotesList;
-	private BigDecimal valueOfAllAcceptedBanknotes = new BigDecimal("0");
-	// public BigDecimal totalCostRemaining;
 
 	private Order order; // Represents the customer order
 	// Consider adapting the other methods to reflect this global variable.
@@ -95,7 +93,6 @@ public class PaymentHandler {
 		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
 	}
@@ -111,7 +108,6 @@ public class PaymentHandler {
 		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
 	}
@@ -127,7 +123,6 @@ public class PaymentHandler {
 		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
 	}
@@ -178,55 +173,61 @@ public class PaymentHandler {
 			value = value.add(coin.getValue());
 		}
 
-		this.amountSpent = value;
-		this.changeRemaining = value.subtract(this.totalCost);
 
 		if (value.compareTo(this.totalCost) < 0)
 			return false; // Return false if the total value of valid coins is less than the total cost.
 
-		this.amountSpent = this.totalCost;
-
 		// Return true if accurate change is dispensed.
-		if (value.compareTo(this.totalCost) > 0) {
+		else{
 			BigDecimal changeValue = value.subtract(this.totalCost);
-			return dispenseAccurateChange(changeValue);
+			if(dispenseAccurateChange(changeValue)) {
+				this.changeRemaining = changeValue;
+				this.amountSpent = this.totalCost;
+				return true;
+			}
+			else
+				return false;
 		}
-		return true;
 	}
 	
 	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
 			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
+		
+		if (SelfCheckoutStationSoftware.getStationBlock()) {
+			System.out.println("Blocked. Please add your item to the bagging area.");
+			return false;
+		}
 		
 		// first check if parameter is null or not
 		if (Banknotes == null) {
 			throw new NullPointerException("Banknotes cannot be null.");
 		}
 		//moved instances of BanknoteValidator and BanknoteInsertion
-		
-		
+		BigDecimal valueOfAllAcceptedBanknotes = new BigDecimal("0");
 		for (Banknote banknote : Banknotes) { // Calculate the total value of coins inserted.
-			
 			acceptInsertedBanknote(banknote);
 			valueOfAllAcceptedBanknotes = valueOfAllAcceptedBanknotes.add(banknote.getDenomination());
-
-			
 		}
-		
 		
 		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be 
 		//paid if not then return false ,s they will need to pay again 
 		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCost) < 0){
 			return false;
 		}// i need to return change
-		
+
 		//if value is equal or greater then cost
 		// have to calculate the change value
-		this.changeRemaining = valueOfAllAcceptedBanknotes.subtract(this.totalCost);
-		if(changeRemaining.compareTo(new BigDecimal(0)) > 0) {
-			return dispenseAccurateChange(changeRemaining);// needs to be made so it can also dispense banknotes
+
+		else{
+			BigDecimal changeValue = valueOfAllAcceptedBanknotes.subtract(this.totalCost);
+			if(dispenseAccurateChange(changeValue)) {
+				this.changeRemaining = changeValue;
+				this.amountSpent = this.totalCost;
+				return true;
+			}
+			else
+				return false;		
 		}
-		
-		return true;
 	}
 	
 
@@ -266,13 +267,23 @@ public class PaymentHandler {
 		// number of banknotes and coins used while considering the limited availability of
 		// each denomination.
 		while (remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
+			System.out.println("HELP");
+			// If neither banknotes nor coins can be used, break the loop
+			BigDecimal lowestCoin = coinDenominations.get(coinDenominations.size() - 1);
+			BigDecimal lowestBankNote = bankNoteDenominations.get(bankNoteDenominations.size() - 1);
+			BigDecimal lowestVal = lowestCoin.min(lowestBankNote);
+			if (remainingAmount.compareTo(lowestVal) < 0 && remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
+				this.checkoutSystem.coinDispensers.get(lowestVal).emit();
+				amountDispensed = changeValue;
+				remainingAmount = BigDecimal.ZERO;
+				break;
+			}
+			
 			boolean dispensed = false;
-
 			// Try using banknotes first
 			for (BigDecimal bankNote : bankNoteDenominations) {
 				if (remainingAmount.compareTo(bankNote) >= 0 && checkoutSystem.banknoteDispensers.get(bankNote).size() > 0) {
 					checkoutSystem.banknoteDispensers.get(bankNote).emit();
-					this.checkoutSystem.banknoteOutput.removeDanglingBanknotes();
 					amountDispensed = amountDispensed.add(bankNote);
 					remainingAmount = remainingAmount.subtract(bankNote);
 					dispensed = true;
@@ -284,6 +295,8 @@ public class PaymentHandler {
 			if (!dispensed) {
 				for (BigDecimal coin : coinDenominations) {
 					if (remainingAmount.compareTo(coin) >= 0 && checkoutSystem.coinDispensers.get(coin).size() > 0) {
+						System.out.println(checkoutSystem.coinDispensers.get(coin).size());
+						System.out.println(coin);
 						checkoutSystem.coinDispensers.get(coin).emit();
 						amountDispensed = amountDispensed.add(coin);
 						remainingAmount = remainingAmount.subtract(coin);
@@ -292,37 +305,27 @@ public class PaymentHandler {
 					}
 				}
 			}
-
-			// If neither banknotes nor coins can be used, break the loop
-			if (!dispensed) {
-				BigDecimal lowestCoin = coinDenominations.get(coinDenominations.size() - 1);
-				BigDecimal lowestBankNote = bankNoteDenominations.get(bankNoteDenominations.size() - 1);
-				BigDecimal lowestVal = lowestCoin.min(lowestBankNote);
-				if (remainingAmount.compareTo(lowestVal) < 0 && remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
-					this.checkoutSystem.coinDispensers.get(lowestVal).emit();
-					amountDispensed = changeValue;
-					remainingAmount = BigDecimal.ZERO;
-				}
-				break;
-			}
+			
+			break;
 		}
 
-		if (remainingAmount.compareTo(BigDecimal.ZERO) == 0) {
-			Scanner receiptRequest = new Scanner(System.in);
-			System.out.println("Would you like a receipt?"); // Asks the user for a receipt
-			String receiptAnswer = receiptRequest.nextLine();
-			while (receiptAnswer.compareToIgnoreCase("yes") != 0 || receiptAnswer.compareToIgnoreCase("no") != 0) {
-				System.out.println("Sorry, that input is not acceptable. Try again."); // Keeps prompting user for receipt until "yes" or "no" answer
-				System.out.println("Would you like a receipt?");
-				receiptAnswer = receiptRequest.nextLine();}
-			if (receiptAnswer.compareToIgnoreCase("yes") == 0) { // If yes, receiptPrinter and thank user
-				printReceiptForCustomer(this.order);
-				System.out.println("Thank you for your time. We hope to see you again!");
-				return true;}
-			if (receiptAnswer.compareToIgnoreCase("no") == 0) { // If no, thank user
-				System.out.println("No worries. Thank you for your time. We hope to see you again!");
-				return true;}}
-		return false;
+		return remainingAmount.compareTo(BigDecimal.ZERO) == 0;
+//		if (remainingAmount.compareTo(BigDecimal.ZERO) == 0) {
+//			Scanner receiptRequest = new Scanner(System.in);
+//			System.out.println("Would you like a receipt?"); // Asks the user for a receipt
+//			String receiptAnswer = receiptRequest.nextLine();
+//			while (receiptAnswer.compareToIgnoreCase("yes") != 0 || receiptAnswer.compareToIgnoreCase("no") != 0) {
+//				System.out.println("Sorry, that input is not acceptable. Try again."); // Keeps prompting user for receipt until "yes" or "no" answer
+//				System.out.println("Would you like a receipt?");
+//				receiptAnswer = receiptRequest.nextLine();}
+//			if (receiptAnswer.compareToIgnoreCase("yes") == 0) { // If yes, receiptPrinter and thank user
+//				printReceiptForCustomer(this.order);
+//				System.out.println("Thank you for your time. We hope to see you again!");
+//				return true;}
+//			if (receiptAnswer.compareToIgnoreCase("no") == 0) { // If no, thank user
+//				System.out.println("No worries. Thank you for your time. We hope to see you again!");
+//				return true;}}
+//		return false;
 
 	}
 
@@ -382,8 +385,6 @@ public class PaymentHandler {
 
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
-
-		System.out.println(order.getOrder().size());
 		for (int i = 0; i < order.getOrder().size(); i++) {
 			String productDescription;
 			Item item = order.getOrder().get(i);
@@ -425,7 +426,6 @@ public class PaymentHandler {
 			this.printerBronze.print('\n');
 
 			if (this.printerBronze.paperRemaining() == 0) {
-				this.checkoutSystem = null;
 				throw new OutOfPaperException("This station is out of paper and needs maintenance.");
 			}
 
@@ -433,12 +433,10 @@ public class PaymentHandler {
 				this.printerBronze.print(receiptItems.get(i).charAt(j));
 
 				if (this.printerBronze.paperRemaining() == 0) {
-					this.checkoutSystem = null;
 					throw new OutOfPaperException("This station is out of paper and needs maintenance.");
 				}
 
 				if (this.printerBronze.inkRemaining() == 0) {
-					this.checkoutSystem = null;
 					throw new OutOfPaperException("This station is out of ink and needs maintenance.");
 				}
 			}
@@ -595,7 +593,6 @@ public class PaymentHandler {
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
 		printReceiptForCustomer(order); // Print the reciept.
 
->>>>>>> branch 'master' of https://github.com/mahfuzalam391/SENG-300-Project-2.git
 	}
 	
 
