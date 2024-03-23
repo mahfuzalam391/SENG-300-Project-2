@@ -503,20 +503,21 @@ public class PaymentHandler {
 			long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
 			if (holdNumber == -1) {
 				// HOLD FAILED
+				System.out.println("The hold on the card failed. Please try again.");
 				return;
 			}
 			boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
 			if (!transaction) {
 				// TRANSACTION FAILED
+				cardIssuer.releaseHold(data.getNumber(), holdNumber); // Remove the hold.
+				System.out.println("The transaction failed. Please try again.");
 				return;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-			// printReceiptForCustomer(order); // Print the reciept.
 		} catch (MagneticStripeFailureException msfe) {
 			System.out.println("Card Swipe failed, please try again!");
 			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
 		}
-
 	}
 
 
@@ -533,31 +534,38 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
 	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
-		AbstractCardReader cardReader = null;
+		try {
+			AbstractCardReader cardReader = null;
 
-		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
-			cardReader = new CardReaderBronze();
-		}
-		else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
-			cardReader = new CardReaderSilver();
-		}
-		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
-			cardReader = new CardReaderGold();
-		}
+			if (checkoutSystem instanceof SelfCheckoutStationBronze) {
+				cardReader = new CardReaderBronze();
+			}
+			else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
+				cardReader = new CardReaderSilver();
+			}
+			else if (checkoutSystem instanceof SelfCheckoutStationGold) {
+				cardReader = new CardReaderGold();
+			}
 
-		CardData data = cardReader.swipe(card);
-		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
-		if (holdNumber == -1) {
-			// HOLD FAILED
-			return;
-		}
-		boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
-		if (!transaction) {
-			// TRANSACTION FAILED
-			return;
-		}
-		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-//		printReceiptForCustomer(order); // Print the reciept.
+			CardData data = cardReader.swipe(card);
 
+			long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
+			if (holdNumber == -1) {
+				// HOLD FAILED
+				System.out.println("The hold on the card failed. Please try again.");
+				return;
+			}
+			boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
+			if (!transaction) {
+				// TRANSACTION FAILED
+				cardIssuer.releaseHold(data.getNumber(), holdNumber); // Remove the hold.
+				System.out.println("The transaction failed. Please try again.");
+				return;
+			}
+			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+		} catch (MagneticStripeFailureException msfe) {
+			System.out.println("Card Swipe failed, please try again!");
+			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
+		}
 	}
 }
