@@ -75,18 +75,6 @@ public class CoinAdder {
 		this.coinsList = new ArrayList<Coin>();
 
 	}
-	
-	/*
-	 * Creates a list of inserted coins that can be used as argument for PaymentHandler.
-	 * For gold self checkout station.
-	 * FOR TESTING
-	 */
-	public CoinAdder(CheckoutStub cStation) {
-		if(cStation == null) throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = cStation;
-		this.coinsList = new ArrayList<Coin>();
-
-	}
 
 	/**
 	 * TA confirmed that iteration 1 would not need user interaction and picking payment mode would come at a later time

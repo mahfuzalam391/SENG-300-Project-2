@@ -130,22 +130,6 @@ public class PaymentHandler {
 		this.order = order;
 	}
 	
-	public PaymentHandler(CheckoutStub station, Order order) throws EmptyDevice, OverloadedDevice {
-		if (station == null)
-			throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = station;
-		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
-		this.printerBronze = new ReceiptPrinterBronze();
-		this.printerBronze.plugIn(PowerGrid.instance());
-		this.printerBronze.turnOn();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.banknotesList = new ArrayList<Banknote>();
-
-		this.order = order;
-	}
-
 	public AbstractSelfCheckoutStation getStation() {
 		return checkoutSystem;
 	}
