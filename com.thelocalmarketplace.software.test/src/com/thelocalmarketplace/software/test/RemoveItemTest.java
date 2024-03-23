@@ -2,6 +2,7 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,4 +76,24 @@ public class RemoveItemTest {
 		scaleBronze.register(baggingAreaListenerSilver);
 	}
 
+	@After
+	public void tearDown() {
+		// deregister BaggingAreaListeners
+		scaleBronze.deregister(baggingAreaListenerBronze);
+		scaleGold.deregister(baggingAreaListenerGold);
+		scaleSilver.deregister(baggingAreaListenerBronze);
+		
+		// disable, turnOff and unplug scales
+		scaleBronze.disable();
+		scaleBronze.turnOff();
+		scaleBronze.unplug();
+		
+		scaleGold.disable();
+		scaleGold.turnOff();
+		scaleGold.unplug();
+		
+		scaleSilver.disable();
+		scaleSilver.turnOff();
+		scaleSilver.unplug();
+	}
 }
