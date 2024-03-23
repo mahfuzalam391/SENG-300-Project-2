@@ -167,7 +167,11 @@ public class DemoIterationTwo {
                         break;
                     case 2:
                         System.out.println("You pay $" + price + " with your debit card.");
-                        paymentHandler.payWithDebitViaSwipe(debitCard, price, cardIssuer);
+                        if (paymentHandler.payWithDebitViaSwipe(debitCard, price, cardIssuer) == -1) {
+                            System.out.println("Unsuccessful Payment! Please try again.");
+                            break;
+                        }
+                        System.out.println("Successful Payment!");
 
                         breakWhileLoop = false;
                         break;
