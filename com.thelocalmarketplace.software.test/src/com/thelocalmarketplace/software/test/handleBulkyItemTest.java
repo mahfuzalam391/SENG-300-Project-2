@@ -65,9 +65,10 @@ public class handleBulkyItemTest {
         }
     }   
 	
-    // if creating and item requires a mass, why is there a separate addTotalWeightInGrams
     
     /*
+     * BRONZE SCALE
+     * 
      * Create test for handleBulkyItem, by creating an order and adding items + weights
      * Call handle bulky item, it should remove the weight of the second item
      * 
@@ -80,7 +81,7 @@ public class handleBulkyItemTest {
         MockItem item2 = new MockItem(new Mass(60));
 		
         orderB.addItemToOrder(item1); 
-        scaleBronze.addAnItem(item1); // irrelevant?
+        scaleBronze.addAnItem(item1); 
         orderB.addTotalWeightInGrams(10);
         orderB.addItemToOrder(item2); 
         orderB.addTotalWeightInGrams(60);
@@ -93,13 +94,22 @@ public class handleBulkyItemTest {
         assertEquals(expectedTotalWeight, orderB.getTotalWeightInGrams(), 0);
   	}
     
+    
+    /*
+     * GOLD SCALE
+     * 
+     * Create test for handleBulkyItem, by creating an order and adding items + weights
+     * Call handle bulky item, it should remove the weight of the second item
+     * 
+     */
+    
     @Test
   	public void testHandleBulkyItem_finalWeightG () throws OverloadedDevice {
         MockItem item1 = new MockItem(new Mass(10));
         MockItem item2 = new MockItem(new Mass(60));
 		
         orderG.addItemToOrder(item1); 
-        scaleGold.addAnItem(item1); // irrelevant?
+        scaleGold.addAnItem(item1); 
         orderG.addTotalWeightInGrams(10);
         orderG.addItemToOrder(item2); 
         orderG.addTotalWeightInGrams(60);
@@ -112,13 +122,20 @@ public class handleBulkyItemTest {
         assertEquals(expectedTotalWeight, orderG.getTotalWeightInGrams(), 0);
   	}
     
+    /*
+     * SILVER SCALE
+     * 
+     * Create test for handleBulkyItem, by creating an order and adding items + weights
+     * Call handle bulky item, it should remove the weight of the second item
+     * 
+     */
     @Test
   	public void testHandleBulkyItem_finalWeightS () throws OverloadedDevice {
         MockItem item1 = new MockItem(new Mass(10));
         MockItem item2 = new MockItem(new Mass(60));
 		
         orderS.addItemToOrder(item1); 
-        scaleSilver.addAnItem(item1); // irrelevant?
+        scaleSilver.addAnItem(item1); 
         orderS.addTotalWeightInGrams(10);
         orderS.addItemToOrder(item2); 
         orderS.addTotalWeightInGrams(60);
