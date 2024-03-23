@@ -61,6 +61,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.PaymentHandler;
+import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.Order;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
@@ -162,6 +163,7 @@ public class PaymentHandlerTest {
         paymentHandlerB.getStation().turnOn();
         PowerGrid.engageUninterruptiblePowerSource();
         PowerGrid.instance().forcePowerRestore();
+        SelfCheckoutStationSoftware.setStationBlock(false);
     }
 
     @After
@@ -174,6 +176,7 @@ public class PaymentHandlerTest {
         
         paymentHandlerB = null;
         checkoutStationB = null;
+        SelfCheckoutStationSoftware.setStationBlock(false);
 
     }
 
@@ -675,7 +678,7 @@ public class PaymentHandlerTest {
 
 
     @Test
-    public void testProcessPaymentWithExactAmount() throws Exception {
+    public void testProcessPaymentCoinWithExactAmount() throws Exception {
         ArrayList<Coin> coinsList = new ArrayList<Coin>();
         Currency currency = Currency.getInstance("CAD");
 
@@ -701,6 +704,34 @@ public class PaymentHandlerTest {
         assertTrue("Payment should succeed with exact amount", paymentHandlerB.processPaymentWithCoins(coinsList));
     }
 
+    @Test
+    public void testProcessPaymentCoinBlocked() throws Exception {
+    	SelfCheckoutStationSoftware.setStationBlock(true);
+    	ArrayList<Coin> coinsList = new ArrayList<Coin>();
+        Currency currency = Currency.getInstance("CAD");
+
+        coin1 = new Coin(currency,new BigDecimal("10.00"));
+        coin2 = new Coin(currency,new BigDecimal("2.00"));
+
+        coinsList.add(coin1);
+        coinsList.add(coin2);
+
+        checkoutStationG.plugIn(PowerGrid.instance());
+        checkoutStationG.turnOn();
+        checkoutStationS.plugIn(PowerGrid.instance());
+        checkoutStationS.turnOn();
+        checkoutStationB.plugIn(PowerGrid.instance());
+        checkoutStationB.turnOn();
+        
+        paymentHandlerG.totalCost = new BigDecimal("12.0");
+        paymentHandlerS.totalCost = new BigDecimal("12.0");
+        paymentHandlerB.totalCost = new BigDecimal("12.0");
+
+        assertFalse(paymentHandlerG.processPaymentWithCoins(coinsList));
+        assertFalse(paymentHandlerS.processPaymentWithCoins(coinsList));
+        assertFalse(paymentHandlerB.processPaymentWithCoins(coinsList));
+    }
+    
     @Test(expected = NullPointerException.class)
     public void testProcessPaymentWithNullCoinsListG() throws Exception {
         paymentHandlerG.processPaymentWithCoins(null); // This should throw NullPointerException
@@ -1255,6 +1286,44 @@ public class PaymentHandlerTest {
         assertTrue("Payment should succeed with exact amount", paymentHandlerG.processPaymentWithBanknotes(notesList));
         assertTrue("Payment should succeed with exact amount", paymentHandlerS.processPaymentWithBanknotes(notesList));
         assertTrue("Payment should succeed with exact amount", paymentHandlerB.processPaymentWithBanknotes(notesList));
+    }
+    
+    @Test
+    public void testProcessPaymentBanknotesBlocked() throws Exception {
+    	SelfCheckoutStationSoftware.setStationBlock(true);
+        Currency currency = Currency.getInstance("CAD");
+
+        checkoutStationG.plugIn(PowerGrid.instance());
+        checkoutStationG.turnOn();
+        paymentHandlerG.totalCost = new BigDecimal("15.0");
+        
+        checkoutStationS.plugIn(PowerGrid.instance());
+        checkoutStationS.turnOn();
+        paymentHandlerS.totalCost = new BigDecimal("15.0");
+        
+        checkoutStationB.plugIn(PowerGrid.instance());
+        checkoutStationB.turnOn();
+        paymentHandlerB.totalCost = new BigDecimal("15.0");
+
+        ArrayList<Banknote> notesList = new ArrayList<Banknote>();
+
+
+        banknote1 = new Banknote(currency,new BigDecimal("10.0"));
+        banknote2 = new Banknote(currency,new BigDecimal("5.0"));
+
+        notesList.add(banknote1);
+        notesList.add(banknote2);
+
+        checkoutStationG.plugIn(PowerGrid.instance());
+        checkoutStationG.turnOn();
+        checkoutStationS.plugIn(PowerGrid.instance());
+        checkoutStationS.turnOn();
+        checkoutStationB.plugIn(PowerGrid.instance());
+        checkoutStationB.turnOn();
+
+        assertFalse(paymentHandlerG.processPaymentWithBanknotes(notesList));
+        assertFalse(paymentHandlerS.processPaymentWithBanknotes(notesList));
+        assertFalse(paymentHandlerB.processPaymentWithBanknotes(notesList));
     }
 
     @Test(expected = NullPointerException.class)

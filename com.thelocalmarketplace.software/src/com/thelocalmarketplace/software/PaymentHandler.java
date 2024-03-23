@@ -82,52 +82,7 @@ public class PaymentHandler {
 
 	private Order order; // Represents the customer order
 	// Consider adapting the other methods to reflect this global variable.
-
-	public PaymentHandler(SelfCheckoutStationBronze station, Order order) throws EmptyDevice, OverloadedDevice {
-		if (station == null)
-			throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = station;
-		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
-		this.printerBronze = new ReceiptPrinterBronze();
-		this.printerBronze.plugIn(PowerGrid.instance());
-		this.printerBronze.turnOn();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-
-		this.order = order;
-	}
-
-	public PaymentHandler(SelfCheckoutStationSilver station, Order order) throws EmptyDevice, OverloadedDevice {
-		if (station == null)
-			throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = station;
-		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
-		this.printerBronze = new ReceiptPrinterBronze();
-		this.printerBronze.plugIn(PowerGrid.instance());
-		this.printerBronze.turnOn();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-
-		this.order = order;
-	}
-
-	public PaymentHandler(SelfCheckoutStationGold station, Order order) throws EmptyDevice, OverloadedDevice {
-		if (station == null)
-			throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = station;
-		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
-		this.printerBronze = new ReceiptPrinterBronze();
-		this.printerBronze.plugIn(PowerGrid.instance());
-		this.printerBronze.turnOn();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-
-		this.order = order;
-	}
-
+	
 	public PaymentHandler(AbstractSelfCheckoutStation station, Order order) throws EmptyDevice, OverloadedDevice {
 		if (station == null)
 			throw new NullPointerException("No argument may be null.");
