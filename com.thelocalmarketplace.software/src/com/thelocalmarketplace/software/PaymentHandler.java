@@ -43,6 +43,7 @@ import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.card.CardReaderBronze;
 import com.jjjwelectronics.card.CardReaderGold;
 import com.jjjwelectronics.card.CardReaderSilver;
+import com.jjjwelectronics.card.MagneticStripeFailureException;
 import com.jjjwelectronics.printer.ReceiptPrinterBronze;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
@@ -484,32 +485,37 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
 	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
-		AbstractCardReader cardReader = null;
+		try {
+			AbstractCardReader cardReader = null;
 
-		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
-			cardReader = new CardReaderBronze();
-		}
-		else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
-			cardReader = new CardReaderSilver();
-		}
-		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
-			cardReader = new CardReaderGold();
-		}
+			if (checkoutSystem instanceof SelfCheckoutStationBronze) {
+				cardReader = new CardReaderBronze();
+			}
+			else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
+				cardReader = new CardReaderSilver();
+			}
+			else if (checkoutSystem instanceof SelfCheckoutStationGold) {
+				cardReader = new CardReaderGold();
+			}
 
-		CardData data = cardReader.swipe(card);
+			CardData data = cardReader.swipe(card);
 
-		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
-		if (holdNumber == -1) {
-			// HOLD FAILED
-			return;
+			long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
+			if (holdNumber == -1) {
+				// HOLD FAILED
+				return;
+			}
+			boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
+			if (!transaction) {
+				// TRANSACTION FAILED
+				return;
+			}
+			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			// printReceiptForCustomer(order); // Print the reciept.
+		} catch (MagneticStripeFailureException msfe) {
+			System.out.println("Card Swipe failed, please try again!");
+			payWithCreditViaSwipe(card, amountCharged, cardIssuer);
 		}
-		boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
-		if (!transaction) {
-			// TRANSACTION FAILED
-			return;
-		}
-		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-//		printReceiptForCustomer(order); // Print the reciept.
 
 	}
 
