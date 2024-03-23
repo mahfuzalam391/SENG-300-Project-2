@@ -484,7 +484,8 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
 	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
-		AbstractCardReader cardReader;
+		AbstractCardReader cardReader = null;
+
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
 			cardReader = new CardReaderBronze();
 		}
@@ -493,14 +494,10 @@ public class PaymentHandler {
 		}
 		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
 			cardReader = new CardReaderGold();
-		} else {
-			// WRITE AN ERROR FIGURE IT OUT LATER
-			return;
 		}
+
 		CardData data = cardReader.swipe(card);
-		Scanner input = new Scanner(System.in);
-		System.out.println("Please Enter Signature:");
-		String signature = input.nextLine();
+
 		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
 		if (holdNumber == -1) {
 			// HOLD FAILED
@@ -530,8 +527,7 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
 	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
-
-		AbstractCardReader cardReader;
+		AbstractCardReader cardReader = null;
 
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
 			cardReader = new CardReaderBronze();
@@ -541,15 +537,9 @@ public class PaymentHandler {
 		}
 		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
 			cardReader = new CardReaderGold();
-		} else {
-			// WRITE AN ERROR FIGURE IT OUT LATER
-			return;
 		}
 
 		CardData data = cardReader.swipe(card);
-		Scanner input = new Scanner(System.in);
-		System.out.println("Please Enter Signature:");
-		String signature = input.nextLine();
 		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
 		if (holdNumber == -1) {
 			// HOLD FAILED
