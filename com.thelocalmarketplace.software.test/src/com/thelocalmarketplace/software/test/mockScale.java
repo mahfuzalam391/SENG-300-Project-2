@@ -45,7 +45,7 @@ import powerutility.PowerGrid;
 public class mockScale extends AbstractElectronicScale {
 	protected mockScale(Mass limit, Mass sensitivityLimit) {
 		super(limit, sensitivityLimit);
-		this.massLimit = limit; // initialize: GJ (maybe delete? 
+		this.massLimit = limit; 
 		// TODO Auto-generated constructor stub
 	}
 
