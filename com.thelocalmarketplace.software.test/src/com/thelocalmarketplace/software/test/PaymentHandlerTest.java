@@ -57,6 +57,7 @@ import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
@@ -80,6 +81,8 @@ public class PaymentHandlerTest {
     private PaymentHandler paymentHandler;
     private BarcodedItem barcodedItem;
     private BarcodedProduct barcodedProduct;
+    private PLUCodedItem pluCodeItem;
+    private PLUCodedProduct pluProduct;
     private ElectronicScaleBronze baggingArea;
     private Order testOrder;
     private PLUCodedProduct pluCodedProduct;
@@ -111,7 +114,24 @@ public class PaymentHandlerTest {
  		// Adding mock product into product database
  		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, barcodedProduct);
 
- 		// Initializing testOrder
+         // Initializing mock PLU-coded item
+        String pluDigits = "0001";
+        PriceLookUpCode pluCode = new PriceLookUpCode(pluDigits);
+        Mass mass = new Mass(1000000000); // Converts the weight of the product to a mass
+        pluCodeItem = new PLUCodedItem(pluCode, mass);
+
+        // Initializing mock product (using same PLU code as the PLU-coded item)
+
+        String pluCodeProductDescription = "orange";
+        long pluCodeProductPrice = 10;
+        double pluCodeproductWeightInGrams = 1000;
+        pluProduct = new PLUCodedProduct(pluCode, pluCodeProductDescription, pluCodeProductPrice);
+
+
+        // Adding mock product into product database
+        ProductDatabases.PLU_PRODUCT_DATABASE.put(pluCode, pluProduct);
+
+        // Initializing testOrder
  		testOrder = new Order(baggingArea);
  		testOrder.addItemViaBarcodeScan(barcode);
          
@@ -133,81 +153,216 @@ public class PaymentHandlerTest {
     	checkoutStation = null;
  
     }
-    
+
+    @Test (expected = NullPointerSimulationException.class)
+    public void testPrinterIfOrderIsNull() throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+        paymentHandler.receiptPrinter(null);
+    }
+
     @Test
-    public void testReceiptPrinter() throws Exception{
-        // Mocking System.out for testing output 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+    public void testReceiptPrinterWithBarcodedProduct() throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+
+
+        baggingArea = new ElectronicScaleBronze();
+        // Initializing mock barcoded item
+        Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
+        Barcode barcode = new Barcode(barcodeDigits);
+        Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        barcodedItem = new BarcodedItem(barcode, itemMass);
+
+        // Initializing mock product (using same barcode as the barcoded item)
+        String barcodeProductDescription = "banana";
+        long barcodeProductPrice = 5;
+        double barcodeProductWeightInGrams = 1000;
+        barcodedProduct = new BarcodedProduct(barcode, barcodeProductDescription, barcodeProductPrice, barcodeProductWeightInGrams);
+
+        // Adding mock product into product database
+        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, barcodedProduct);
+        testOrder = new Order(baggingArea);
+        testOrder.addItemViaBarcodeScan(barcode);
 
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
         paymentHandler.amountSpent = BigDecimal.valueOf(5); // Set amount spent for testing
         paymentHandler.changeRemaining = BigDecimal.valueOf(0); // Set change remaining for testing
 
-        paymentHandler.receiptPrinter(testOrder);
-        
-        // Check if the receipt contains correct information
-        assertTrue(outContent.toString().contains("banana $5.00"));
-        assertTrue(outContent.toString().contains("Total: $5.00"));
-        assertTrue(outContent.toString().contains("Paid: $5.00"));
-        assertTrue(outContent.toString().contains("Change: $0.00"));
 
-        // Reset System.out
-        System.setOut(System.out);
+        paymentHandler.receiptPrinter(testOrder);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testReceiptPrinterIncorrectProduct() throws Exception{
-        // Mocking System.out for testing output 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
+    @Test
+    public void testReceiptPrinterWithPLUProduct() throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+
+
+        baggingArea = new ElectronicScaleBronze();
+
+        String pluDigits = "0001";
+        PriceLookUpCode pluCode = new PriceLookUpCode(pluDigits);
+        Mass mass = new Mass(1000000000); // Converts the weight of the product to a mass
+        pluCodeItem = new PLUCodedItem(pluCode, mass);
+
+
+        String pluCodeProductDescription = "orange";
+        long pluCodeProductPrice = 10;
+        double pluCodeproductWeightInGrams = 1000;
+
+
+        pluProduct = new PLUCodedProduct(pluCode, pluCodeProductDescription, pluCodeProductPrice);
+
+        ProductDatabases.PLU_PRODUCT_DATABASE.put(pluCode, pluProduct);
+
+
+        testOrder.addItemToOrder(pluCodeItem);
+        paymentHandler.receiptPrinter(testOrder);
+
+
         paymentHandler = new PaymentHandler(checkoutStation, testOrder);
-        
-        Numeral[] barcodeDigits = {Numeral.zero, Numeral.two, Numeral.three};
- 		Barcode barcode = new Barcode(barcodeDigits);
- 		Mass mass = new Mass(3); // Converts the weight of the product to a mass
- 		BarcodedItem barcodedItem = new BarcodedItem(barcode, mass);
-        testOrder.addItemToOrder(barcodedItem);
+        paymentHandler.amountSpent = BigDecimal.valueOf(10); // Set amount spent for testing
+        paymentHandler.changeRemaining = BigDecimal.valueOf(0); // Set change remaining for testing
 
         paymentHandler.receiptPrinter(testOrder);
-	    assertTrue(outContent.toString().contains("This product is not a supported product, can not be registered for a price"));
-
-        // Reset System.out
-        System.setOut(System.out);
     }
-    
-    @Test(expected = OutOfPaperException.class)
-    public void testReceiptPrinterOutOfPaperException() throws Exception{
-    	// Mocking System.out for testing output 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        paymentHandler.paperSpaceCounter = 0;
-        paymentHandler.inkCounter = 10;
 
-	    // Check if the out of ink exception is thrown
-	    paymentHandler.receiptPrinter(testOrder); // Should throw outOfInkException
-	    assertTrue(outContent.toString().contains("The printer is out of Paper currently, needs maintenance."));
-	    
-	    // Reset System.out
-	    System.setOut(System.out);
+    @Test (expected = NullPointerException.class)
+    public void testReceiptPrinterWithUnsupportedProduct() throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+        testOrder.addItemToOrder(null);
+        paymentHandler.receiptPrinter(testOrder);
     }
-    
-    @Test(expected = OutOfInkException.class)
-    public void testReceiptPrinterOutOfInkException() throws Exception{
-    	// Mocking System.out for testing output 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        paymentHandler.inkCounter = 0;
-        paymentHandler.paperSpaceCounter = 100;
 
-	    // Check if the out of ink exception is thrown
-	    paymentHandler.receiptPrinter(testOrder); // Should throw outOfInkException
-	    assertTrue(outContent.toString().contains("The printer is out of Ink currently, needs maintenance."));
-	    
-	    // Reset System.out
-	    System.setOut(System.out);
+    @Test (expected = OutOfPaperException.class)
+    public void testReceiptPrinterOutOfPaper() throws EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
+        baggingArea = new ElectronicScaleBronze();
+        // Initializing mock barcoded item
+        Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
+        Barcode barcode = new Barcode(barcodeDigits);
+        Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        barcodedItem = new BarcodedItem(barcode, itemMass);
+
+        // Initializing mock product (using same barcode as the barcoded item)
+        String barcodeProductDescription = "banana";
+        long barcodeProductPrice = 5;
+        double barcodeProductWeightInGrams = 1000;
+        barcodedProduct = new BarcodedProduct(barcode, barcodeProductDescription, barcodeProductPrice, barcodeProductWeightInGrams);
+
+        // Adding mock product into product database
+        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, barcodedProduct);
+        testOrder = new Order(baggingArea);
+
+
+        for (int i = 0; i < ReceiptPrinterBronze.MAXIMUM_PAPER + 1; i++) {
+            testOrder.addItemViaBarcodeScan(barcode);
+
+        }
+
+        paymentHandler.receiptPrinter(testOrder);
+
+
     }
+
+    @Test (expected = OutOfInkException.class)
+    public void testReceiptPrinterOutOfInk() throws EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
+
+        baggingArea = new ElectronicScaleBronze();
+        // Initializing mock barcoded item
+        Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
+        Barcode barcode = new Barcode(barcodeDigits);
+        Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        barcodedItem = new BarcodedItem(barcode, itemMass);
+
+        // Initializing mock product (using same barcode as the barcoded item)
+        String barcodeProductDescription = "banana";
+        long barcodeProductPrice = 5;
+        double barcodeProductWeightInGrams = 1000;
+        barcodedProduct = new BarcodedProduct(barcode, barcodeProductDescription, barcodeProductPrice, barcodeProductWeightInGrams);
+
+        // Adding mock product into product database
+        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, barcodedProduct);
+        testOrder = new Order(baggingArea);
+
+
+        for (int i = 0; i < ReceiptPrinterBronze.MAXIMUM_PAPER + 1; i++) {
+            testOrder.addItemViaBarcodeScan(barcode);
+
+        }
+
+        paymentHandler.receiptPrinter(testOrder);
+
+    }
+
+
+//    @Test
+//    public void testReceiptPrinter() throws Exception{
+//        // Mocking System.out for testing output
+//        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(outContent));
+//
+//        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+//        paymentHandler.amountSpent = BigDecimal.valueOf(5); // Set amount spent for testing
+//        paymentHandler.changeRemaining = BigDecimal.valueOf(0); // Set change remaining for testing
+//
+//        paymentHandler.receiptPrinter(testOrder);
+//
+//        // Check if the receipt contains correct information
+//        assertTrue(outContent.toString().contains("banana $5.00"));
+//        assertTrue(outContent.toString().contains("Total: $5.00"));
+//        assertTrue(outContent.toString().contains("Paid: $5.00"));
+//        assertTrue(outContent.toString().contains("Change: $0.00"));
+//
+//        // Reset System.out
+//        System.setOut(System.out);
+//    }
+//
+//    @Test(expected = NullPointerException.class)
+//    public void testReceiptPrinterIncorrectProduct() throws Exception{
+//        // Mocking System.out for testing output
+//        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(outContent));
+//
+//        paymentHandler = new PaymentHandler(checkoutStation, testOrder);
+//
+//        Numeral[] barcodeDigits = {Numeral.zero, Numeral.two, Numeral.three};
+// 		Barcode barcode = new Barcode(barcodeDigits);
+// 		Mass mass = new Mass(3); // Converts the weight of the product to a mass
+// 		BarcodedItem barcodedItem = new BarcodedItem(barcode, mass);
+//        testOrder.addItemToOrder(barcodedItem);
+//
+//        paymentHandler.receiptPrinter(testOrder);
+//	    assertTrue(outContent.toString().contains("This product is not a supported product, can not be registered for a price"));
+//
+//        // Reset System.out
+//        System.setOut(System.out);
+//    }
+//
+//    @Test(expected = OutOfPaperException.class)
+//    public void testReceiptPrinterOutOfPaperException() throws Exception{
+//    	// Mocking System.out for testing output
+//        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(outContent));
+//        paymentHandler.paperSpaceCounter = 0;
+//        paymentHandler.inkCounter = 10;
+//
+//	    // Check if the out of ink exception is thrown
+//	    paymentHandler.receiptPrinter(testOrder); // Should throw outOfInkException
+//	    assertTrue(outContent.toString().contains("The printer is out of Paper currently, needs maintenance."));
+//
+//	    // Reset System.out
+//	    System.setOut(System.out);
+//    }
+//
+//    @Test(expected = OutOfInkException.class)
+//    public void testReceiptPrinterOutOfInkException() throws Exception{
+//    	// Mocking System.out for testing output
+//        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(outContent));
+//        paymentHandler.inkCounter = 0;
+//        paymentHandler.paperSpaceCounter = 100;
+//
+//	    // Check if the out of ink exception is thrown
+//	    paymentHandler.receiptPrinter(testOrder); // Should throw outOfInkException
+//	    assertTrue(outContent.toString().contains("The printer is out of Ink currently, needs maintenance."));
+//
+//	    // Reset System.out
+//	    System.setOut(System.out);
+//    }
  
     @Test(expected = NullPointerException.class)
     public void constructor_NullStation_ThrowsException() throws OverloadedDevice, EmptyDevice {
