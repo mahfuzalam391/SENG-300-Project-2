@@ -272,7 +272,7 @@ public class PaymentHandler {
 			for (BigDecimal bankNote : bankNoteDenominations) {
 				if (remainingAmount.compareTo(bankNote) >= 0 && checkoutSystem.banknoteDispensers.get(bankNote).size() > 0) {
 					checkoutSystem.banknoteDispensers.get(bankNote).emit();
-					//this.checkoutSystem.banknoteOutput.removeDanglingBanknotes();
+					this.checkoutSystem.banknoteOutput.removeDanglingBanknotes();
 					amountDispensed = amountDispensed.add(bankNote);
 					remainingAmount = remainingAmount.subtract(bankNote);
 					dispensed = true;
