@@ -126,11 +126,11 @@ public class PaymentHandler {
 
 		this.order = order;
 	}
-	
+
 	public AbstractSelfCheckoutStation getStation() {
 		return checkoutSystem;
 	}
-	
+
 	/**
 	 * will be used to help with Signaling to the Customer the updated amount
 	 * due after the insertion of each coin.
@@ -177,7 +177,7 @@ public class PaymentHandler {
 		if (value.compareTo(this.totalCost) < 0)
 			return false; // Return false if the total value of valid coins is less than the total cost.
 
-		// Return true if accurate change is dispensed.
+			// Return true if accurate change is dispensed.
 		else{
 			BigDecimal changeValue = value.subtract(this.totalCost);
 			if(dispenseAccurateChange(changeValue)) {
@@ -189,15 +189,15 @@ public class PaymentHandler {
 				return false;
 		}
 	}
-	
+
 	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
 			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
-		
+
 		if (SelfCheckoutStationSoftware.getStationBlock()) {
 			System.out.println("Blocked. Please add your item to the bagging area.");
 			return false;
 		}
-		
+
 		// first check if parameter is null or not
 		if (Banknotes == null) {
 			throw new NullPointerException("Banknotes cannot be null.");
@@ -208,9 +208,9 @@ public class PaymentHandler {
 			acceptInsertedBanknote(banknote);
 			valueOfAllAcceptedBanknotes = valueOfAllAcceptedBanknotes.add(banknote.getDenomination());
 		}
-		
-		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be 
-		//paid if not then return false ,s they will need to pay again 
+
+		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be
+		//paid if not then return false ,s they will need to pay again
 		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCost) < 0){
 			return false;
 		}// i need to return change
@@ -226,10 +226,10 @@ public class PaymentHandler {
 				return true;
 			}
 			else
-				return false;		
+				return false;
 		}
 	}
-	
+
 
 
 	/**
@@ -278,7 +278,7 @@ public class PaymentHandler {
 				remainingAmount = BigDecimal.ZERO;
 				break;
 			}
-			
+
 			boolean dispensed = false;
 			// Try using banknotes first
 			for (BigDecimal bankNote : bankNoteDenominations) {
@@ -305,7 +305,7 @@ public class PaymentHandler {
 					}
 				}
 			}
-			
+
 			break;
 		}
 
@@ -319,7 +319,7 @@ public class PaymentHandler {
 //				System.out.println("Would you like a receipt?");
 //				receiptAnswer = receiptRequest.nextLine();}
 //			if (receiptAnswer.compareToIgnoreCase("yes") == 0) { // If yes, receiptPrinter and thank user
-//				printReceiptForCustomer(this.order);
+//				receiptPrinter(this.order);
 //				System.out.println("Thank you for your time. We hope to see you again!");
 //				return true;}
 //			if (receiptAnswer.compareToIgnoreCase("no") == 0) { // If no, thank user
@@ -381,7 +381,7 @@ public class PaymentHandler {
 	 */
 
 
-	public String printReceiptForCustomer(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+	public String receiptPrinter(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
@@ -425,20 +425,10 @@ public class PaymentHandler {
 		for (int i = 0; i < receiptItems.size(); i++) {
 			this.printerBronze.print('\n');
 
-			if (this.printerBronze.paperRemaining() == 0) {
-				throw new OutOfPaperException("This station is out of paper and needs maintenance.");
-			}
 
 			for (int j = 0; j < receiptItems.get(i).length(); j++) {
 				this.printerBronze.print(receiptItems.get(i).charAt(j));
 
-				if (this.printerBronze.paperRemaining() == 0) {
-					throw new OutOfPaperException("This station is out of paper and needs maintenance.");
-				}
-
-				if (this.printerBronze.inkRemaining() == 0) {
-					throw new OutOfPaperException("This station is out of ink and needs maintenance.");
-				}
 			}
 
 		}
@@ -499,8 +489,8 @@ public class PaymentHandler {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Processes a credit card payment via swipe.
 	 *
@@ -542,11 +532,11 @@ public class PaymentHandler {
 			return;
 		}
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-		printReceiptForCustomer(order); // Print the reciept.
+//		printReceiptForCustomer(order); // Print the reciept.
 
 	}
-	
-	
+
+
 	/**
 	 * Processes a debit card payment via swipe.
 	 *
@@ -560,9 +550,9 @@ public class PaymentHandler {
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
 	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
-		
+
 		AbstractCardReader cardReader;
-		
+
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
 			cardReader = new CardReaderBronze();
 		}
@@ -575,7 +565,7 @@ public class PaymentHandler {
 			// WRITE AN ERROR FIGURE IT OUT LATER
 			return;
 		}
-		
+
 		CardData data = cardReader.swipe(card);
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please Enter Signature:");
@@ -591,10 +581,10 @@ public class PaymentHandler {
 			return;
 		}
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
-		printReceiptForCustomer(order); // Print the reciept.
+//		printReceiptForCustomer(order); // Print the reciept.
 
 	}
-	
+
 
 }
 
