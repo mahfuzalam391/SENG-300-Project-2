@@ -102,7 +102,6 @@ public class handleBulkyItemTest {
      * Call handle bulky item, it should remove the weight of the second item
      * 
      */
-    
     @Test
   	public void testHandleBulkyItem_finalWeightG () throws OverloadedDevice {
         MockItem item1 = new MockItem(new Mass(10));
