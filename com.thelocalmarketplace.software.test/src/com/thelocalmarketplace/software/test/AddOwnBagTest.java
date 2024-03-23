@@ -1,3 +1,26 @@
+/**
+ * Yotam Rojnov (UCID: 30173949)
+ * Duncan McKay (UCID: 30177857)
+ * Mahfuz Alam (UCID:30142265)
+ * Luis Trigueros Granillo (UCID: 30167989)
+ * Lilia Skumatova (UCID: 30187339)
+ * Abdelrahman Abbas (UCID: 30110374)
+ * Talaal Irtija (UCID: 30169780)
+ * Alejandro Cardona (UCID: 30178941)
+ * Alexandre Duteau (UCID: 30192082)
+ * Grace Johnson (UCID: 30149693)
+ * Abil Momin (UCID: 30154771)
+ * Tara Ghasemi M. Rad (UCID: 30171212)
+ * Izabella Mawani (UCID: 30179738)
+ * Binish Khalid (UCID: 30061367)
+ * Fatima Khalid (UCID: 30140757)
+ * Lucas Kasdorf (UCID: 30173922)
+ * Emily Garcia-Volk (UCID: 30140791)
+ * Yuinikoru Futamata (UCID: 30173228)
+ * Joseph Tandyo (UCID: 30182561)
+ * Syed Haider (UCID: 30143096)
+ * Nami Marwah (UCID: 30178528)
+ */
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,6 +35,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
@@ -26,7 +50,9 @@ public class AddOwnBagTest {
 	private Order order; 
 	private AddOwnBag addOwnBag; //object under test 
 	private mockScale scale;
-	private BigDecimal threshold; 
+	private Mass massLimit; 
+	
+
 	
 	
 	/**
@@ -37,14 +63,25 @@ public class AddOwnBagTest {
 	@Before
 	public void setUp() throws OverloadedDevice { 
 		scale = new mockScale(new Mass(40000000),new Mass(40000000));
-		order = new Order(scale); 
+		order = new Order(scale);  
+		massLimit = scale.getMassLimit();
 		addOwnBag = new AddOwnBag(order, scale); 
-		threshold = new BigDecimal(50000000);
-		
-	
-		
+		PowerGrid grid = PowerGrid.instance();
+        scale.plugIn(grid);
+        scale.turnOn();
+        scale.enable();
 	}
 
+	
+	/** MockItem class for use when adding a bag to an order. The bag added will be the Item
+	 * 
+	 */
+	class MockItem extends Item {
+	       public MockItem(Mass mass) {
+	           super(mass);
+	       }
+	   }   
+	
 	@Test 
 	public void testGetBagWeightBagAdded() throws OverloadedDevice {
 		//the order has a weight of the mock scale in before (40000000)
@@ -66,12 +103,20 @@ public class AddOwnBagTest {
 	}
 	
 	
+	
+	// testing that when a bag is added with a weight above the threshold. If the new mass of the scale is above 
+	// the scale threshold weight then it should block because too heavy 
+	
 	@Test 
-	public void testAddBagWeightOverThreshold() throws OverloadedDevice {
-	//making the scale weight above the threshold weight 
-	mockScale scaleOverLimit = new mockScale(new Mass(6000000), new Mass(60000000));
-	AddOwnBag addOwnbag = new AddOwnBag(order, scaleOverLimit); 
-	addOwnbag.addbagweight(order, scaleOverLimit, 50000000); 
+	public void testAddBagWeightOverThreshold() throws OverloadedDevice { 
+	Mass massLimit = new Mass(50000000);
+	//need to set the scale limit somehow 
+	mockScale scaleOverLimit = new mockScale(new Mass(60000000), new Mass(60000000));
+	AddOwnBag addOwnBag = new AddOwnBag(order, scaleOverLimit); 
+	double bagWeight = addOwnBag.getBagWeight(order, scaleOverLimit);
+	
+	addOwnBag.addbagweight(order, scaleOverLimit, bagWeight);
+	Assert.assertEquals(20000000, massLimit);
 	assertTrue(SelfCheckoutStationSoftware.getStationBlock()); 
 	
 	}
@@ -87,4 +132,16 @@ public class AddOwnBagTest {
 		
 	}
 }
+
+
+
+
+// Need to add java doc for each test 
+// test the attendant thing too 
+
+
+
+
+
+
 
