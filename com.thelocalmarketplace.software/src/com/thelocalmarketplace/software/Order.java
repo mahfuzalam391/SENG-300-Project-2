@@ -180,8 +180,9 @@ public class Order {
 
 	/**
 	 * Signals that a specific item is to be removed from the order
+	 * @throws OverloadedDevice 
 	 */
-	public void signalToRemoveItemFromOrder() {
+	public void signalToRemoveItemFromOrder() throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
 		System.out.println("Please select the item you want to remove from the order.");
 
@@ -199,7 +200,7 @@ public class Order {
 				SelfCheckoutStationSoftware.setStationBlock(true);
 
 				// remove the item from the order
-				removeItemFromOrder(order.get(Integer.parseInt(itemToRemove) - 1));
+				removeItemFromOrder((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1));
 
 				Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
 				BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
@@ -210,6 +211,9 @@ public class Order {
 				displayOrder(); // Displays the order to the customer after removal
 			}
 		}
+		
+		// check for weight discrepancy, then unlock the station
+		checkForDiscrepancy();
 	}
 
 	public void displayOrder(){

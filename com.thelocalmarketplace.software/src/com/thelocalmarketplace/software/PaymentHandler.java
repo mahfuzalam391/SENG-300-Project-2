@@ -22,9 +22,7 @@
  * Nami Marwah (UCID: 30178528)
  */
 
-
 package com.thelocalmarketplace.software;
-
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -51,6 +49,7 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteInsertionSlot;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
@@ -63,6 +62,7 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
+import powerutility.PowerGrid;
 
 /**
  * Manages the payment process with coins for a self-checkout system.
@@ -73,11 +73,13 @@ public class PaymentHandler {
 	public BigDecimal amountSpent;
 	public BigDecimal changeRemaining = BigDecimal.ZERO;
 	public BigDecimal totalCost = new BigDecimal(0);
+	public BigDecimal amountInserted;
 	private AbstractSelfCheckoutStation checkoutSystem = null;
 	private ArrayList<Item> allItemOrders;
 	private ReceiptPrinterBronze printerBronze;
-	private ArrayList<Coin> coinsList;
 	private ArrayList<Banknote> banknotesList;
+	private BigDecimal valueOfAllAcceptedBanknotes = new BigDecimal("0");
+	// public BigDecimal totalCostRemaining;
 
 	private Order order; // Represents the customer order
 	// Consider adapting the other methods to reflect this global variable.
@@ -89,9 +91,10 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
@@ -104,9 +107,10 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
@@ -119,29 +123,15 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
 		this.banknotesList = new ArrayList<Banknote>();
 
 		this.order = order;
 	}
 	
-	public PaymentHandler(CheckoutStub station, Order order) throws EmptyDevice, OverloadedDevice {
-		if (station == null)
-			throw new NullPointerException("No argument may be null.");
-		this.checkoutSystem = station;
-		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
-		this.printerBronze = new ReceiptPrinterBronze();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
-		this.coinsList = new ArrayList<Coin>();
-		this.banknotesList = new ArrayList<Banknote>();
-
-		this.order = order;
-	}
-
 	public AbstractSelfCheckoutStation getStation() {
 		return checkoutSystem;
 	}
@@ -203,6 +193,42 @@ public class PaymentHandler {
 		}
 		return true;
 	}
+	
+	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
+			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice, OutOfPaperException, OutOfInkException {
+		
+		// first check if parameter is null or not
+		if (Banknotes == null) {
+			throw new NullPointerException("Banknotes cannot be null.");
+		}
+		//moved instances of BanknoteValidator and BanknoteInsertion
+		
+		
+		for (Banknote banknote : Banknotes) { // Calculate the total value of coins inserted.
+			
+			acceptInsertedBanknote(banknote);
+			valueOfAllAcceptedBanknotes = valueOfAllAcceptedBanknotes.add(banknote.getDenomination());
+
+			
+		}
+		
+		
+		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be 
+		//paid if not then return false ,s they will need to pay again 
+		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCost) < 0){
+			return false;
+		}// i need to return change
+		
+		//if value is equal or greater then cost
+		// have to calculate the change value
+		this.changeRemaining = valueOfAllAcceptedBanknotes.subtract(this.totalCost);
+		if(changeRemaining.compareTo(new BigDecimal(0)) > 0) {
+			return dispenseAccurateChange(changeRemaining);// needs to be made so it can also dispense banknotes
+		}
+		
+		return true;
+	}
+	
 
 
 	/**
@@ -354,7 +380,6 @@ public class PaymentHandler {
 
 	public String printReceiptForCustomer(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 
-
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
 
@@ -458,7 +483,7 @@ public class PaymentHandler {
 	 * @throws CashOverloadException If the banknote dispensers are overloaded with
 	 *                               banknotes.
 	 */
-	public void loadBankNoteDispenser(Banknote ...banknotes) throws CashOverloadException {
+	public void loadBanknoteDispenser(Banknote ...banknotes) throws CashOverloadException {
 		if (banknotes == null) {
 			throw new NullPointerSimulationException("coins instance cannot be null.");
 		}
@@ -476,7 +501,20 @@ public class PaymentHandler {
 			}
 		}
 	}
-
+	
+	
+	/**
+	 * Processes a credit card payment via swipe.
+	 *
+	 * @param card         The credit card to be used for payment.
+	 * @param amountCharged The amount to be charged to the credit card.
+	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
+	 * @throws IOException          If an I/O error occurs.
+	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
+	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
+	 * @throws EmptyDevice          If the checkout station device is empty.
+	 * @throws OverloadedDevice     If the checkout station device is overloaded.
+	 */
 	public void payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 		AbstractCardReader cardReader;
 		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
@@ -508,9 +546,58 @@ public class PaymentHandler {
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
 		printReceiptForCustomer(order); // Print the reciept.
 
-
 	}
+	
+	
+	/**
+	 * Processes a debit card payment via swipe.
+	 *
+	 * @param card         The debit card to be used for payment.
+	 * @param amountCharged The amount to be charged to the debit card.
+	 * @param cardIssuer   The card issuer responsible for authorizing the transaction.
+	 * @throws IOException          If an I/O error occurs.
+	 * @throws OutOfPaperException  If the printer runs out of paper during receipt printing.
+	 * @throws OutOfInkException    If the printer runs out of ink during receipt printing.
+	 * @throws EmptyDevice          If the checkout station device is empty.
+	 * @throws OverloadedDevice     If the checkout station device is overloaded.
+	 */
+	public void payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+		
+		AbstractCardReader cardReader;
+		
+		if (checkoutSystem instanceof SelfCheckoutStationBronze) {
+			cardReader = new CardReaderBronze();
+		}
+		else if (checkoutSystem instanceof SelfCheckoutStationSilver) {
+			cardReader = new CardReaderSilver();
+		}
+		else if (checkoutSystem instanceof SelfCheckoutStationGold) {
+			cardReader = new CardReaderGold();
+		} else {
+			// WRITE AN ERROR FIGURE IT OUT LATER
+			return;
+		}
+		
+		CardData data = cardReader.swipe(card);
+		Scanner input = new Scanner(System.in);
+		System.out.println("Please Enter Signature:");
+		String signature = input.nextLine();
+		long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
+		if (holdNumber == -1) {
+			// HOLD FAILED
+			return;
+		}
+		boolean transaction = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountCharged);
+		if (!transaction) {
+			// TRANSACTION FAILED
+			return;
+		}
+		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+		printReceiptForCustomer(order); // Print the reciept.
 
+>>>>>>> branch 'master' of https://github.com/mahfuzalam391/SENG-300-Project-2.git
+	}
+	
 
 }
 
