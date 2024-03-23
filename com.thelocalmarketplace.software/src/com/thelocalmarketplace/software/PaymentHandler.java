@@ -319,7 +319,7 @@ public class PaymentHandler {
 				System.out.println("Would you like a receipt?");
 				receiptAnswer = receiptRequest.nextLine();}
 			if (receiptAnswer.compareToIgnoreCase("yes") == 0) { // If yes, receiptPrinter and thank user
-				printReceiptForCustomer(this.order);
+				receiptPrinter(this.order);
 				System.out.println("Thank you for your time. We hope to see you again!");
 				return true;}
 			if (receiptAnswer.compareToIgnoreCase("no") == 0) { // If no, thank user
@@ -381,7 +381,7 @@ public class PaymentHandler {
 	 */
 
 
-	public String printReceiptForCustomer(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
+	public String receiptPrinter(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
