@@ -51,7 +51,6 @@ public class AddOwnBagTest {
 	private AddOwnBag addOwnBag; //object under test 
 	private mockScale scale;
 	private Mass massLimit; 
-	private WeightDiscrepancy weightDiscrepancy;
 	
 
 	
@@ -67,7 +66,6 @@ public class AddOwnBagTest {
 		order = new Order(scale);  
 		massLimit = scale.getMassLimit();
 		addOwnBag = new AddOwnBag(order, scale); 
-		weightDiscrepancy = new WeightDiscrepancy(order, scale);
 	}
 
 	
