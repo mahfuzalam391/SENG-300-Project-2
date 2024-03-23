@@ -22,9 +22,7 @@
  * Nami Marwah (UCID: 30178528)
  */
 
-
 package com.thelocalmarketplace.software;
-
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -63,6 +61,7 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
+import powerutility.PowerGrid;
 
 /**
  * Manages the payment process with coins for a self-checkout system.
@@ -104,6 +103,8 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
 		this.coinsList = new ArrayList<Coin>();
@@ -119,6 +120,8 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
 		this.coinsList = new ArrayList<Coin>();
@@ -134,6 +137,8 @@ public class PaymentHandler {
 		this.allItemOrders = order.getOrder();
 		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
+		this.printerBronze.plugIn(PowerGrid.instance());
+		this.printerBronze.turnOn();
 		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
 		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
 		this.coinsList = new ArrayList<Coin>();
@@ -354,7 +359,6 @@ public class PaymentHandler {
 
 	public String printReceiptForCustomer(Order order) throws OutOfPaperException, OutOfInkException, EmptyDevice, OverloadedDevice {
 
-
 		ArrayList<String> receiptItems = new ArrayList<String>();
 
 
@@ -508,9 +512,7 @@ public class PaymentHandler {
 		totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
 		printReceiptForCustomer(order); // Print the reciept.
 
-
 	}
-
 
 }
 
