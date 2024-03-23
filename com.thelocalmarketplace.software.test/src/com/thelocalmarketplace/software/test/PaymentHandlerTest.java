@@ -468,6 +468,10 @@ public class PaymentHandlerTest {
         assertEquals(1, checkoutStation.coinDispensers.get(BigDecimal.valueOf(0.10)).size());
     }
     
+    
+ 
+ // Tests for acceptInsertedCoin
+    
  // Tests whether valid coins will be inserted if the checkout station's storage unit has space
     @Test
     public void testInsertValidCoinsIfEnoughSpace() throws DisabledException, CashOverloadException {
