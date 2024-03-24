@@ -1580,9 +1580,8 @@ public class PaymentHandlerTest {
         assertEquals(paymentHandlerB.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
     }
     
-
     @Test
-    public void testPayWithCreditViaSwipe() throws IOException, EmptyDevice, OverloadedDevice {
+    public void testPayWithCreditViaSwipe() throws IOException {
         Card creditCard = new Card("Credit", "21", "Holder1", "211");
         CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
         Calendar expiry = Calendar.getInstance();
@@ -1590,13 +1589,29 @@ public class PaymentHandlerTest {
         cardIssuer.addCardData(creditCard.number, creditCard.cardholder, expiry, creditCard.cvv, 2000);
         int amountCharged = 1;
         int expectedResult = 1;
-        assertEquals(paymentHandlerG.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
-        assertEquals(paymentHandlerS.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
-    	assertEquals(paymentHandlerB.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
+
+        int actualResultG = -1;
+        while (actualResultG == -1) { // ignore Card Swipe Failed exception
+        	actualResultG = paymentHandlerG.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+        
+        int actualResultS = -1;
+    	while (actualResultS == -1) { // ignore Card Swipe Failed exception
+        	actualResultS = paymentHandlerS.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+    	
+    	int actualResultB = -1;
+    	while (actualResultB == -1) { // ignore Card Swipe Failed exception
+        	actualResultB = paymentHandlerB.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+        
+    	assertEquals(actualResultG, expectedResult);
+    	assertEquals(actualResultS, expectedResult);
+    	assertEquals(actualResultB, expectedResult);
     }
     
     @Test
-    public void testPayWithDebitViaSwipe() throws IOException, EmptyDevice, OverloadedDevice {
+    public void testPayWithDebitViaSwipe() throws IOException {
     	Card debitCard = new Card("Debit", "12", "Holder2", "122");
     	CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
         Calendar expiry = Calendar.getInstance();
@@ -1604,8 +1619,84 @@ public class PaymentHandlerTest {
         cardIssuer.addCardData(debitCard.number, debitCard.cardholder, expiry, debitCard.cvv, 2000);
         int amountCharged = 1;
         int expectedResult = 1;
-        assertEquals(paymentHandlerG.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
-        assertEquals(paymentHandlerS.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
-        assertEquals(paymentHandlerB.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
+
+        int actualResultG = -1;
+        while (actualResultG == -1) { // ignore Card Swipe Failed exception
+        	actualResultG = paymentHandlerG.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+        
+        int actualResultS = -1;
+    	while (actualResultS == -1) { // ignore Card Swipe Failed exception
+        	actualResultS = paymentHandlerS.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+    	
+    	int actualResultB = -1;
+    	while (actualResultB == -1) { // ignore Card Swipe Failed exception
+        	actualResultB = paymentHandlerB.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+        
+    	assertEquals(actualResultG, expectedResult);
+    	assertEquals(actualResultS, expectedResult);
+    	assertEquals(actualResultB, expectedResult);
+    }
+    
+    @Test
+    public void testPayWithCreditViaSwipeFailedSwipe() throws IOException {
+        Card creditCard = new Card("Credit", "21", "Holder1", "211");
+        CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData(creditCard.number, creditCard.cardholder, expiry, creditCard.cvv, 2000);
+        int amountCharged = 1;
+        int expectedResult = -1;
+
+        int actualResultG = 1;
+        while (actualResultG == 1) { // ignore successful swipe
+        	actualResultG = paymentHandlerG.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+        
+        int actualResultS = 1;
+    	while (actualResultS == 1) { // ignore successful swipe
+        	actualResultS = paymentHandlerS.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+    	
+    	int actualResultB = 1;
+    	while (actualResultB == 1) { // ignore successful swipe
+        	actualResultB = paymentHandlerB.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer);
+        }
+        
+    	assertEquals(actualResultG, expectedResult);
+    	assertEquals(actualResultS, expectedResult);
+    	assertEquals(actualResultB, expectedResult);
+    }
+    
+    @Test
+    public void testPayWithDebitViaSwipeFailedSwipe() throws IOException {
+    	Card debitCard = new Card("Debit", "12", "Holder2", "122");
+    	CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData(debitCard.number, debitCard.cardholder, expiry, debitCard.cvv, 2000);
+        int amountCharged = 1;
+        int expectedResult = -1;
+
+        int actualResultG = 1;
+        while (actualResultG == 1) { // ignore successful swipe
+        	actualResultG = paymentHandlerG.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+        
+        int actualResultS = 1;
+    	while (actualResultS == 1) { // ignore successful swipe
+        	actualResultS = paymentHandlerS.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+    	
+    	int actualResultB = 1;
+    	while (actualResultB == 1) { // ignore successful swipe
+        	actualResultB = paymentHandlerB.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer);
+        }
+        
+    	assertEquals(actualResultG, expectedResult);
+    	assertEquals(actualResultS, expectedResult);
+    	assertEquals(actualResultB, expectedResult);
     }
 }
