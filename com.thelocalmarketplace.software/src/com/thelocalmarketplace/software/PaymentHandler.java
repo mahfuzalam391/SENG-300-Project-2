@@ -26,12 +26,10 @@ package com.thelocalmarketplace.software;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import com.jjjwelectronics.EmptyDevice;
@@ -50,9 +48,7 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
-import com.tdc.banknote.BanknoteInsertionSlot;
 import com.tdc.coin.Coin;
-import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
@@ -97,8 +93,8 @@ public class PaymentHandler {
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.plugIn(PowerGrid.instance());
 		this.printerBronze.turnOn();
-		this.printerBronze.addInk(this.printerBronze.MAXIMUM_INK);
-		this.printerBronze.addPaper(this.printerBronze.MAXIMUM_PAPER);
+		this.printerBronze.addInk(ReceiptPrinterBronze.MAXIMUM_INK);
+		this.printerBronze.addPaper(ReceiptPrinterBronze.MAXIMUM_PAPER);
 
 		this.order = order;
 	}
