@@ -223,15 +223,17 @@ public class DemoIterationTwo {
                     default:
                         System.out.println("Invalid choice. Please enter a valid option.");
                 }
+            } // End of payment while loop
 
-                input.close();
+            // Proper closure of resources and final messages can be added here
+            System.out.println("Thank you for using the self-checkout system.");
 
-
-            } catch(Exception e){
-                System.out.println("Failed to initialize order: " + e.getMessage());
-            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("Failed to initialize order: " + e.getMessage());
+        } finally {
+            if (input != null) {
+                input.close();
+            }
         }
     }
 }
