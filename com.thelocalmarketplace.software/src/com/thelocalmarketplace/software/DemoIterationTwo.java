@@ -24,6 +24,8 @@
 
 package com.thelocalmarketplace.software;
 
+import static com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation.resetConfigurationToDefaults;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -54,6 +56,15 @@ public class DemoIterationTwo {
 
         AbstractSelfCheckoutStation station = null;
         AbstractElectronicScale scale = null;
+        BigDecimal[] denominations = {BigDecimal.valueOf(3), BigDecimal.valueOf(5), BigDecimal.valueOf(1)};
+
+        // Configure all the selfcheckoutstation fields
+        AbstractSelfCheckoutStation.configureCurrency(Currency.getInstance(Locale.CANADA));
+        AbstractSelfCheckoutStation.configureBanknoteDenominations(denominations);
+        AbstractSelfCheckoutStation.configureBanknoteStorageUnitCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinDenominations(denominations);
+        AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinTrayCapacity(10);
 
         CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
 
