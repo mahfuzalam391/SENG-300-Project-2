@@ -103,6 +103,7 @@ public class DemoIterationTwo {
                 break;
         }
 
+        PowerGrid.engageUninterruptiblePowerSource();
         station.plugIn(PowerGrid.instance());
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
@@ -268,8 +269,8 @@ public class DemoIterationTwo {
 
             System.out.println("Would you like a receipt?");
             String receiptChoice = input.nextLine();
-
-            if (receiptChoice.equals("Yes")) {
+            
+            if (receiptChoice.equalsIgnoreCase("Yes")) {
                 paymentHandler.receiptPrinter(order);
             }
             // Proper closure of resources and final messages can be added here
