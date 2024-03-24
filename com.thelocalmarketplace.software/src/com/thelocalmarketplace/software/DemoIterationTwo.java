@@ -30,11 +30,13 @@ import java.io.IOException;
 import java.util.*;
 
 import com.jjjwelectronics.card.Card;
+import com.tdc.AbstractComponent;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+import com.tdc.coin.CoinStorageUnit;
 import com.jjjwelectronics.*;
 import com.jjjwelectronics.scanner.*;
 import com.jjjwelectronics.scale.*;
@@ -106,6 +108,8 @@ public class DemoIterationTwo {
 
         PowerGrid.engageUninterruptiblePowerSource();
         station.plugIn(PowerGrid.instance());
+        station.coinStorage.activate();
+
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
         try {
