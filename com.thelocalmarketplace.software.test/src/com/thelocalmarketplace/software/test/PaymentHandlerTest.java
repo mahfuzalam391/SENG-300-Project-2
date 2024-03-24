@@ -815,7 +815,7 @@ public class PaymentHandlerTest {
         checkoutStationG.turnOn();
         paymentHandlerG.loadCoinDispenser(coin1, coin2);
 
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Coin c = new Coin(currency, new BigDecimal("0.10"));
         paymentHandlerG.loadCoinDispenser(c);
     }
@@ -835,7 +835,7 @@ public class PaymentHandlerTest {
         checkoutStationS.turnOn();
         paymentHandlerS.loadCoinDispenser(coin1, coin2);
 
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Coin c = new Coin(currency, new BigDecimal("0.10"));
         paymentHandlerS.loadCoinDispenser(c);
     }
@@ -855,7 +855,7 @@ public class PaymentHandlerTest {
         checkoutStationB.turnOn();
         paymentHandlerB.loadCoinDispenser(coin1, coin2);
 
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Coin c = new Coin(currency, new BigDecimal("0.10"));
         paymentHandlerB.loadCoinDispenser(c);
     }
@@ -1422,7 +1422,7 @@ public class PaymentHandlerTest {
         for (int i = 0 ; i < capacity ; i++) {
             paymentHandlerG.loadBanknoteDispenser(banknote1);
         }
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
         paymentHandlerG.loadBanknoteDispenser(banknote2);
     }
@@ -1441,7 +1441,7 @@ public class PaymentHandlerTest {
         for (int i = 0 ; i < capacity ; i++) {
             paymentHandlerS.loadBanknoteDispenser(banknote1);
         }
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
         paymentHandlerS.loadBanknoteDispenser(banknote2);
     }
@@ -1460,7 +1460,7 @@ public class PaymentHandlerTest {
         for (int i = 0 ; i < capacity ; i++) {
             paymentHandlerB.loadBanknoteDispenser(banknote1);
         }
-        //should throw overlaod error on this load
+        //should throw overload error on this load
         Banknote banknote2 = new Banknote(currency, BigDecimal.valueOf(5.00));
         paymentHandlerB.loadBanknoteDispenser(banknote2);
     }
