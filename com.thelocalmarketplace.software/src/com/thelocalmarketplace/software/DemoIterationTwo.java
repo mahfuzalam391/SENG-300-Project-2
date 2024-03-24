@@ -31,6 +31,7 @@ import com.jjjwelectronics.card.Card;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
+import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.jjjwelectronics.*;
 import com.jjjwelectronics.scanner.*;
@@ -116,7 +117,7 @@ public class DemoIterationTwo {
             // Make an arraylist for the coins added
             ArrayList<Coin> coinsList = new ArrayList<>();
 
-            int price = 0;
+            double price = 0;
 
             while (true) {
                 // User interaction
@@ -161,7 +162,8 @@ public class DemoIterationTwo {
                             System.out.println("Unsuccessful Payment! Please try again.");
                             break;
                         }
-                        System.out.println("Successful Payment!");
+                        price = paymentHandler.getTotalCost().doubleValue();
+                        System.out.println("Successful Payment! The total price is now $" + price + ".");
 
                         breakWhileLoop = false;
                         break;
@@ -171,14 +173,15 @@ public class DemoIterationTwo {
                             System.out.println("Unsuccessful Payment! Please try again.");
                             break;
                         }
-                        System.out.println("Successful Payment!");
+                        
+                        System.out.println("Successful Payment! The total price is now $" + price + ".");
 
                         breakWhileLoop = false;
                         break;
 
                     case 3:
                         if (price == 5) {
-                            System.out.println("You insert 5 $1 bills.");
+                            System.out.println("You insert 5 $1 coins.");
 
                             // Add 5 1 dollar coins to the coinsList
                             for (int i = 0; i < 5; i++) {
@@ -194,7 +197,7 @@ public class DemoIterationTwo {
                             }
 
                         } else {
-                            System.out.println("You insert 3 $1 bills.");
+                            System.out.println("You insert 3 $1 coins.");
 
                             // Add 3 1 dollar coins to the coinsList
                             for (int i = 0; i < 3; i++) {
@@ -216,15 +219,42 @@ public class DemoIterationTwo {
                     case 4:
                         System.out.println("You have selected to pay with banknote.");
 
-                        // Add your banknote payment logic here
-
+                        if (price == 5) {
+                            System.out.println("You insert a $5 bill.");
+                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(5));
+                            ArrayList<Banknote> banknotes = new ArrayList<>();
+                            banknotes.add(banknote);
+                            if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
+                                System.out.println("Payment Successful!");
+                            } else {
+                                System.out.println("Unsuccessful Payment! Please try again.");
+                                break;
+                            }
+                        } else {
+                            System.out.println("You insert a $3 bill.");
+                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(3));
+                            ArrayList<Banknote> banknotes = new ArrayList<>();
+                            banknotes.add(banknote);
+                            if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
+                                System.out.println("Payment Succesful!");
+                            } else {
+                                System.out.println("Unsuccessful Payment! Please try again.");
+                                break;
+                            }
+                        }
                         breakWhileLoop = false;
                         break;
+
                     default:
                         System.out.println("Invalid choice. Please enter a valid option.");
                 }
             } // End of payment while loop
 
+            System.out.println("Would you like a receipt?");
+            String receiptChoice = input.nextLine();
+            if (receiptChoice.equalsIgnoreCase("Yes")) {
+                paymentHandler.receiptPrinter(order);
+            }
             // Proper closure of resources and final messages can be added here
             System.out.println("Thank you for using the self-checkout system.");
 

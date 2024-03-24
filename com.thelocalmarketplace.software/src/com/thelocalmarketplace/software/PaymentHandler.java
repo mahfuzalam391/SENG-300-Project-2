@@ -117,6 +117,14 @@ public class PaymentHandler {
 		return this.changeRemaining;
 	}
 
+	/**
+	 * Obtain the total cost of the purchase.
+	 * @return the total cost
+	 */
+	public BigDecimal getTotalCost() {
+		return this.totalCost;
+	}
+
 
 	/**
 	 * Processes payment using coins inserted by the customer.
@@ -457,7 +465,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public int payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
+	public int payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException {
 		try {
 			AbstractCardReader cardReader = null;
 
@@ -488,6 +496,8 @@ public class PaymentHandler {
 				return -1;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			amountSpent = BigDecimal.valueOf(amountCharged);
+			changeRemaining = BigDecimal.ZERO;
 			// Receipt printing is handled inside the demo
 			return 1;
 		} catch (MagneticStripeFailureException msfe) {
@@ -507,7 +517,7 @@ public class PaymentHandler {
 	 * @throws EmptyDevice          If the checkout station device is empty.
 	 * @throws OverloadedDevice     If the checkout station device is overloaded.
 	 */
-	public int payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException, EmptyDevice, OverloadedDevice {
+	public int payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException {
 		try {
 			AbstractCardReader cardReader = null;
 
@@ -538,6 +548,8 @@ public class PaymentHandler {
 				return -1;
 			}
 			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			amountSpent = BigDecimal.valueOf(amountCharged);
+			changeRemaining = BigDecimal.ZERO;
 			return 1;
 			// Receipt printing is handled inside the demo
 		} catch (MagneticStripeFailureException msfe) {
