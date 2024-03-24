@@ -193,6 +193,7 @@ public class DemoIterationTwo {
                             break;
                         }
                         
+                        price = paymentHandler.getTotalCost().doubleValue();
                         System.out.println("Successful Payment! The total price is now $" + price + ".");
 
                         breakWhileLoop = false;
