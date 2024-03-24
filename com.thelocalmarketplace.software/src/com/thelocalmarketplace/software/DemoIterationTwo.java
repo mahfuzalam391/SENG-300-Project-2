@@ -24,6 +24,8 @@
 
 package com.thelocalmarketplace.software;
 
+import static com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation.resetConfigurationToDefaults;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -39,6 +41,9 @@ import com.jjjwelectronics.scale.*;
 import com.thelocalmarketplace.hardware.*;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
+
+import powerutility.PowerGrid;
+
 import java.math.BigDecimal;
 
 
@@ -54,6 +59,16 @@ public class DemoIterationTwo {
 
         AbstractSelfCheckoutStation station = null;
         AbstractElectronicScale scale = null;
+        BigDecimal[] denominations = {BigDecimal.valueOf(3), BigDecimal.valueOf(5), BigDecimal.valueOf(1)};
+
+        // Configure all the selfcheckoutstation fields
+        AbstractSelfCheckoutStation.configureCurrency(Currency.getInstance(Locale.CANADA));
+        AbstractSelfCheckoutStation.configureBanknoteDenominations(denominations);
+        AbstractSelfCheckoutStation.configureBanknoteStorageUnitCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinDenominations(denominations);
+        AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinTrayCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinDispenserCapacity(10);
 
         CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
 
@@ -71,6 +86,7 @@ public class DemoIterationTwo {
         System.out.println("Enter '3' for bronze system.");
 
         int stationType = input.nextInt();
+        input.nextLine();
 
         // Initialize the station and scale
         switch (stationType) {
@@ -88,6 +104,8 @@ public class DemoIterationTwo {
                 break;
         }
 
+        PowerGrid.engageUninterruptiblePowerSource();
+        station.plugIn(PowerGrid.instance());
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
         try {
@@ -154,6 +172,7 @@ public class DemoIterationTwo {
                 System.out.print("Enter your choice (1/2/3/4): ");
 
                 int paymentChoice = input.nextInt();
+                input.nextLine();
 
                 switch (paymentChoice) {
                     case 1:
@@ -174,6 +193,7 @@ public class DemoIterationTwo {
                             break;
                         }
                         
+                        price = paymentHandler.getTotalCost().doubleValue();
                         System.out.println("Successful Payment! The total price is now $" + price + ".");
 
                         breakWhileLoop = false;
@@ -250,16 +270,19 @@ public class DemoIterationTwo {
                 }
             } // End of payment while loop
 
-            System.out.println("Would you like a receipt?");
+            System.out.println("Would you like a receipt? (Yes/No)");
             String receiptChoice = input.nextLine();
+            
             if (receiptChoice.equalsIgnoreCase("Yes")) {
-                paymentHandler.receiptPrinter(order);
+                System.out.println(paymentHandler.receiptPrinter(order));
             }
             // Proper closure of resources and final messages can be added here
             System.out.println("Thank you for using the self-checkout system.");
+            System.exit(0);
 
         } catch (Exception e) {
             System.out.println("Failed to initialize order: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             if (input != null) {
                 input.close();
