@@ -790,12 +790,12 @@ public class PaymentHandlerTest {
         paymentHandlerG.loadCoinDispenser(coin1, coin2);
         paymentHandlerS.loadCoinDispenser(coin1, coin2);
         paymentHandlerB.loadCoinDispenser(coin1, coin2);
-        assertTrue(checkoutStationG.coinDispensers.get(BigDecimal.valueOf(0.25)).size() == 1);
-        assertTrue(checkoutStationG.coinDispensers.get(new BigDecimal("0.10")).size() == 1);
-        assertTrue(checkoutStationS.coinDispensers.get(BigDecimal.valueOf(0.25)).size() == 1);
-        assertTrue(checkoutStationS.coinDispensers.get(new BigDecimal("0.10")).size() == 1);
-        assertTrue(checkoutStationB.coinDispensers.get(BigDecimal.valueOf(0.25)).size() == 1);
-        assertTrue(checkoutStationB.coinDispensers.get(new BigDecimal("0.10")).size() == 1);
+        assertEquals(checkoutStationG.coinDispensers.get(BigDecimal.valueOf(0.25)).size(), 1);
+        assertEquals(checkoutStationG.coinDispensers.get(new BigDecimal("0.10")).size(), 1);
+        assertEquals(checkoutStationS.coinDispensers.get(BigDecimal.valueOf(0.25)).size(), 1);
+        assertEquals(checkoutStationS.coinDispensers.get(new BigDecimal("0.10")).size(), 1);
+        assertEquals(checkoutStationB.coinDispensers.get(BigDecimal.valueOf(0.25)).size(), 1);
+        assertEquals(checkoutStationB.coinDispensers.get(new BigDecimal("0.10")).size(), 1);
     }
 
     /**
