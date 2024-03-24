@@ -110,6 +110,7 @@ public class DemoIterationTwo {
         station.plugIn(PowerGrid.instance());
         station.coinStorage.activate();
         station.coinSlot.activate();
+        station.coinValidator.activate();
 
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
