@@ -44,7 +44,7 @@ public class RemoveItemTest {
 	public void setup() throws OverloadedDevice{
 		// start session
 		SelfCheckoutStationSoftware.setStationActive(true);
-		
+
 		// create a power grid
 		grid = PowerGrid.instance();
 		// to avoid power outages when there is a power surge
@@ -66,7 +66,7 @@ public class RemoveItemTest {
 		scaleSilver.plugIn(grid);
 		scaleSilver.turnOn();
 		scaleSilver.enable();
-		
+
 		// Initialize a mock barcoded item that will be added to each order
 		Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
 		Barcode barcode = new Barcode(barcodeDigits);
@@ -101,23 +101,27 @@ public class RemoveItemTest {
 
 		baggingAreaListenerSilver = new BaggingAreaListener(orderSilver);
 		scaleBronze.register(baggingAreaListenerSilver);
-		
+
 		// adding a barcodedItem to the order
 		orderBronze.addItemToOrder(barcodedItem);
 		// add to total weight in the order
 		orderBronze.addTotalWeightInGrams(productWeightInGrams);
+		// add to the total price in the order
+		orderBronze.addTotalPrice(productPrice);
 		// add the item to the scale
 		scaleBronze.addAnItem(barcodedItem);
-		
+
 		orderGold.addItemToOrder(barcodedItem);
 		orderGold.addTotalWeightInGrams(productWeightInGrams);
+		orderGold.addTotalPrice(productPrice);
 		scaleGold.addAnItem(barcodedItem);
-		
+
 		orderSilver.addItemToOrder(barcodedItem);
 		orderSilver.addTotalWeightInGrams(productWeightInGrams);
+		orderSilver.addTotalPrice(productPrice);
 		scaleSilver.addAnItem(barcodedItem);
 	}
-	
+
 	// test that the weight in the order changed after the item is removed from order
 	@Test
 	public void testWeightAfterRemovingItemFromOrderBronze() {
@@ -134,7 +138,7 @@ public class RemoveItemTest {
 		double newWeight = orderGold.getTotalWeightInGrams();
 		assertTrue(prevWeight > newWeight);
 	}
-	
+
 	@Test
 	public void testWeightAfterRemovingItemFromOrderSilver() {
 		double prevWeight = orderSilver.getTotalWeightInGrams();
@@ -142,45 +146,96 @@ public class RemoveItemTest {
 		double newWeight = orderSilver.getTotalWeightInGrams();
 		assertTrue(prevWeight > newWeight);
 	}
-	
+
+	// test that the total price of the order decreases when an item is removed from the order
+	@Test
+	public void testDecreaseInPriceForOrderBronze() {
+		long prevPrice = orderBronze.getTotalPrice();
+		orderBronze.removeItemFromOrder(barcodedItem);
+		long newPrice = orderBronze.getTotalPrice();
+
+		assertTrue(prevPrice > newPrice);
+	}
+
+	@Test
+	public void testDecreaseInPriceForOrderGold() {
+		long prevPrice = orderGold.getTotalPrice();
+		orderGold.removeItemFromOrder(barcodedItem);
+		long newPrice = orderGold.getTotalPrice();
+
+		assertTrue(prevPrice > newPrice);
+	}
+
+	@Test
+	public void testDecreaseInPriceForOrderSilver() {
+		long prevPrice = orderSilver.getTotalPrice();
+		orderSilver.removeItemFromOrder(barcodedItem);
+		long newPrice = orderSilver.getTotalPrice();
+
+		assertTrue(prevPrice > newPrice);
+	}
+
+	// test that the weight decreases when the item is removed from the scale
 	@Test
 	public void testWeightChangedOnScaleBronze() throws OverloadedDevice {
 		Mass prevMassOnScale = scaleBronze.getCurrentMassOnTheScale();
 		scaleBronze.removeAnItem(barcodedItem);
 		Mass currMassOnScale = scaleBronze.getCurrentMassOnTheScale();
-		
+
 		// comparing currMassOnScale with prevMassOnScale should return -1, since currMassOnScale < prevMassOnScale
 		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
 	}
-	
+
 	@Test
 	public void testWeightChangedOnScaleGold() throws OverloadedDevice {
 		Mass prevMassOnScale = scaleGold.getCurrentMassOnTheScale();
 		scaleGold.removeAnItem(barcodedItem);
 		Mass currMassOnScale = scaleGold.getCurrentMassOnTheScale();
-		
+
 		// comparing currMassOnScale with prevMassOnScale should return -1, since currMassOnScale < prevMassOnScale
 		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
 	}
-	
+
 	@Test
 	public void testWeightChangedOnScaleSilver() throws OverloadedDevice {
 		Mass prevMassOnScale = scaleSilver.getCurrentMassOnTheScale();
 		scaleSilver.removeAnItem(barcodedItem);
 		Mass currMassOnScale = scaleSilver.getCurrentMassOnTheScale();
-		
+
 		// comparing currMassOnScale with prevMassOnScale should return -1, since currMassOnScale < prevMassOnScale
 		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
 	}
 
+
+	// test that item is not removed when order is empty
+	@Test
+	public void testRemoveItemWhenOrderBronzeIsEmpty() throws OverloadedDevice{
+		orderBronze = new Order(scaleBronze);
+		// removeItemFromOrder should return false since the order is empty
+		assertFalse(orderBronze.removeItemFromOrder(barcodedItem));
+	}
+
+	@Test
+	public void testRemoveItemWhenOrderGoldIsEmpty() throws OverloadedDevice{
+		orderGold = new Order(scaleGold);
+		// removeItemFromOrder should return false since the order is empty
+		assertFalse(orderGold.removeItemFromOrder(barcodedItem));
+	}
+
+	@Test
+	public void testRemoveItemWhenOrderSilverIsEmpty() throws OverloadedDevice{
+		orderSilver = new Order(scaleSilver);
+		// removeItemFromOrder should return false since the order is empty
+		assertFalse(orderSilver.removeItemFromOrder(barcodedItem));
+	}
 	@After
 	public void tearDown() {
 		// deregister BaggingAreaListeners
 		scaleBronze.deregister(baggingAreaListenerBronze);
-		
+
 		scaleGold.deregister(baggingAreaListenerGold);
 		scaleSilver.deregister(baggingAreaListenerBronze);
-		
+
 		// disable, turnOff and unplug scales
 		scaleBronze.disable();
 		scaleBronze.turnOff();
