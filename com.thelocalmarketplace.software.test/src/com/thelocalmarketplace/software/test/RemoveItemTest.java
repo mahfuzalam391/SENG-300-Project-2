@@ -228,6 +228,25 @@ public class RemoveItemTest {
 		// removeItemFromOrder should return false since the order is empty
 		assertFalse(orderSilver.removeItemFromOrder(barcodedItem));
 	}
+	@Test
+   	 public void testRemovingLastItemGold() {
+        	orderGold.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderGold.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderGold.removeItemFromOrder(barcodedItem));
+	}
+	@Test
+    	public void testRemovingLastItemSilver() {
+        	orderSilver.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderSilver.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderSilver.removeItemFromOrder(barcodedItem));
+	}
+	@Test
+    	public void testRemovingLastItemBronze() {
+        	orderBronze.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderBronze.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderBronze.removeItemFromOrder(barcodedItem));
+	}
+	
 	@After
 	public void tearDown() {
 		// deregister BaggingAreaListeners
