@@ -65,6 +65,7 @@ public class DemoIterationTwo {
         AbstractSelfCheckoutStation.configureCoinDenominations(denominations);
         AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(10);
         AbstractSelfCheckoutStation.configureCoinTrayCapacity(10);
+        AbstractSelfCheckoutStation.configureCoinDispenserCapacity(10);
 
         CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
 
