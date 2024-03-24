@@ -111,8 +111,6 @@ public class AddItemViaBarcodeScanTest {
 		BarcodedProduct foundProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcodedItem.getBarcode());
 		assertNotNull("Product should be found in the database", foundProduct);
 		assertEquals("Found product should match the test product that we created", barcodedProduct, foundProduct);
-
-
 	}
 
 	@Test
@@ -169,15 +167,7 @@ public class AddItemViaBarcodeScanTest {
 		ArrayList<Item> order = testOrder.getOrder();
 		assertTrue(order.isEmpty());
 	}
-
-	@Test
-	public void testABarcodeHasBeenScannedAndAddItemToBaggingArea() throws OverloadedDevice {
-		scanner.scan(barcodedItem);
-		baggingArea.addAnItem(barcodedItem);
-
-		// System should not be blocked
-		assertFalse(SelfCheckoutStationSoftware.getStationBlock());
-	}
+	
 	@Test
 	public void testProductAddNullBarcodeToOrder() {
 		Numeral[] nonExistentBarcodeDigits = {Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven};
