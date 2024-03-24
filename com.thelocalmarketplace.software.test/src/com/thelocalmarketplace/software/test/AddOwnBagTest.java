@@ -79,18 +79,31 @@ public class AddOwnBagTest {
 	       }
 	   }   
 	
+	/**
+	 * Test for getBagWeight when a bag has been added to the scale. Creating a scale heavier than the order value 
+	 * expected weight = bag weight, calculated from the scale and order weight difference
+	 * @throws OverloadedDevice
+	 */
+	
 	@Test 
 	public void testGetBagWeightBagAdded() throws OverloadedDevice {
 		//the order has a weight of the mock scale in before (40000000)
-		// weight of the scale with the order and the bag added 10 grams more than the weight of the order
+		// weight of the scale with the order and the bag added is 10000000 (10 grams) more than the weight of the order
 		mockScale orderAndBagScale = new mockScale(new Mass(5000000), new Mass(5000000)); 
 		AddOwnBag addOwnBag = new AddOwnBag(order, orderAndBagScale);
-		//bag weight being calculated by subtracting the order weight from the order and bag weight on the scale 
-		double bagWeight = addOwnBag.getBagWeight(order, orderAndBagScale);
-		// the difference expected is 10 grams so bagWeight should be 10 grams 
+		//bag weight being calculated
+		double bagWeight = addOwnBag.getBagWeight(order, orderAndBagScale); 
 		assertEquals(10.0, bagWeight, 10.0);
 	}
  
+	
+	
+	/**
+	 * Testing getBagWeight when no bag has been added. The scale and order are the same weight because no bag
+	 * has been added to the scale. 
+	 * Expected bag weight is 0.0 
+	 * @throws OverloadedDevice
+	 */
 	@Test
 	public void testGetBagWeightNoBag() throws OverloadedDevice {
 		mockScale orderNoBagScale = new mockScale(new Mass(4000000), new Mass (4000000));
@@ -104,26 +117,36 @@ public class AddOwnBagTest {
 	// testing that when a bag is added with a weight above the threshold. If the new mass of the scale is above 
 	// the scale threshold weight then it should block because too heavy 
 	
+	/**
+	 * Testing addbagweight() when a bag is added to the scale when its over the threshold weight. 
+	 * Creating new mockScale, adding an item to push scale over mass limit and a new bag. 
+	 * expected to block system. 
+	 * @throws OverloadedDevice
+	 */
 	@Test 
 	public void testAddBagWeightOverThreshold() throws OverloadedDevice { 
-	// scale with a mass limit of 40000000
 	mockScale scaleOverLimit = new mockScale(new Mass(40000000), new Mass(40000000));
 	//adding a new item to exceed the mass limit 
 	scaleOverLimit.addAnItem(new MockItem(new Mass(45000000))); 
 	//adding bag (1 gram) to the over limit scale 
 	addOwnBag.addbagweight(order, scaleOverLimit, 1000000); 
 	assertTrue(SelfCheckoutStationSoftware.getStationBlock()); 
-	
 	}
 	
-	
+	/**
+	 * Testing addbagweight() when a under bag is added to the scale under the threshold weight. 
+	 * Creating new mockScale, adding an item that remains under mass limit, and adding a new bag where scale weight 
+	 * will still remain under limit. 
+	 * system expected to remain unblocked. 
+	 * @throws OverloadedDevice
+	 */
 	@Test
 	public void testAddBagWeightWithinThreshold() throws OverloadedDevice { 
 		mockScale scaleInLimit = new mockScale(new Mass(40000000), new Mass(40000000));
 		// adding an item to the scale that is within the mass limit 
 		scaleInLimit.addAnItem(new MockItem(new Mass(29000000)));  
 		// adding a bag that does not exceed the scaleInLimit mass limit
-		addOwnBag.addbagweight(order, scaleInLimit, 1000000);
+		addOwnBag.addbagweight(order, scaleInLimit, 100000);
 		//when the items are within the scale mass limit the system should not be blocked
 		assertFalse(SelfCheckoutStationSoftware.getStationBlock()); 
 	}
