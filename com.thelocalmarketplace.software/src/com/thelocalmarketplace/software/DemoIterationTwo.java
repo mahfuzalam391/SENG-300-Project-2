@@ -36,10 +36,12 @@ import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+import com.tdc.coin.CoinDispenserGold;
 import com.tdc.coin.CoinStorageUnit;
 import com.jjjwelectronics.*;
 import com.jjjwelectronics.scanner.*;
 import com.jjjwelectronics.scale.*;
+import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.*;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
@@ -111,6 +113,10 @@ public class DemoIterationTwo {
         station.coinStorage.activate();
         station.coinSlot.activate();
         station.coinValidator.activate();
+        for (Map.Entry<BigDecimal, ICoinDispenser> entry : station.coinDispensers.entrySet()) {
+            entry.getValue().activate();
+        }
+
 
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
