@@ -41,6 +41,9 @@ import com.jjjwelectronics.scale.*;
 import com.thelocalmarketplace.hardware.*;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
+
+import powerutility.PowerGrid;
+
 import java.math.BigDecimal;
 
 
@@ -100,6 +103,7 @@ public class DemoIterationTwo {
                 break;
         }
 
+        station.plugIn(PowerGrid.instance());
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
         try {
@@ -264,7 +268,8 @@ public class DemoIterationTwo {
 
             System.out.println("Would you like a receipt?");
             String receiptChoice = input.nextLine();
-            if (receiptChoice.equalsIgnoreCase("Yes")) {
+
+            if (receiptChoice.equals("Yes")) {
                 paymentHandler.receiptPrinter(order);
             }
             // Proper closure of resources and final messages can be added here
