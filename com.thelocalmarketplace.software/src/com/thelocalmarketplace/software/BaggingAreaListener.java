@@ -76,7 +76,6 @@ public class BaggingAreaListener implements ElectronicScaleListener {
 		// This will be for the use case Add item by Barcode Scan
 		// Signals to the system that the weight has changed
 
-		System.out.println("Weight changed in the bagging area: " + mass);
 
 		try {
 			order.checkForDiscrepancy();
