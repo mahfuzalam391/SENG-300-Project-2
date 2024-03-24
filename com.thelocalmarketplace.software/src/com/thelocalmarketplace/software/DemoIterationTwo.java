@@ -273,6 +273,7 @@ public class DemoIterationTwo {
             String receiptChoice = input.nextLine();
             
             if (receiptChoice.equalsIgnoreCase("Yes")) {
+                System.out.println("Should be printing below");
                 paymentHandler.receiptPrinter(order);
             }
             // Proper closure of resources and final messages can be added here
