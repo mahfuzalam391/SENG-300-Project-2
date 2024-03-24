@@ -28,6 +28,7 @@ import static com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation.reset
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.jjjwelectronics.card.Card;
 import com.tdc.AbstractComponent;
@@ -35,6 +36,7 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
+import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinDispenserGold;
 import com.tdc.coin.CoinStorageUnit;
@@ -113,7 +115,12 @@ public class DemoIterationTwo {
         station.coinStorage.activate();
         station.coinSlot.activate();
         station.coinValidator.activate();
+
         for (Map.Entry<BigDecimal, ICoinDispenser> entry : station.coinDispensers.entrySet()) {
+            entry.getValue().activate();
+        }
+
+        for (Entry<BigDecimal, IBanknoteDispenser> entry : station.banknoteDispensers.entrySet()) {
             entry.getValue().activate();
         }
 
