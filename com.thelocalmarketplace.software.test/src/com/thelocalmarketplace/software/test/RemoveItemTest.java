@@ -153,6 +153,25 @@ public class RemoveItemTest {
 		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
 	}
 	
+	@Test
+	public void testWeightChangedOnScaleGold() throws OverloadedDevice {
+		Mass prevMassOnScale = scaleGold.getCurrentMassOnTheScale();
+		scaleGold.removeAnItem(barcodedItem);
+		Mass currMassOnScale = scaleGold.getCurrentMassOnTheScale();
+		
+		// comparing currMassOnScale with prevMassOnScale should return -1, since currMassOnScale < prevMassOnScale
+		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
+	}
+	
+	@Test
+	public void testWeightChangedOnScaleSilver() throws OverloadedDevice {
+		Mass prevMassOnScale = scaleSilver.getCurrentMassOnTheScale();
+		scaleSilver.removeAnItem(barcodedItem);
+		Mass currMassOnScale = scaleSilver.getCurrentMassOnTheScale();
+		
+		// comparing currMassOnScale with prevMassOnScale should return -1, since currMassOnScale < prevMassOnScale
+		assertEquals(currMassOnScale.compareTo(prevMassOnScale), -1);
+	}
 
 	@After
 	public void tearDown() {
