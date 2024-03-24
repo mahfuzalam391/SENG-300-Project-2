@@ -115,6 +115,8 @@ public class DemoIterationTwo {
         station.coinStorage.activate();
         station.coinSlot.activate();
         station.coinValidator.activate();
+        station.banknoteStorage.activate();
+        station.banknoteValidator.activate();
 
         for (Map.Entry<BigDecimal, ICoinDispenser> entry : station.coinDispensers.entrySet()) {
             entry.getValue().activate();
