@@ -278,7 +278,7 @@ public class DemoIterationTwo {
             }
             // Proper closure of resources and final messages can be added here
             System.out.println("Thank you for using the self-checkout system.");
-            return;
+            System.exit(0);
 
         } catch (Exception e) {
             System.out.println("Failed to initialize order: " + e.getMessage());
