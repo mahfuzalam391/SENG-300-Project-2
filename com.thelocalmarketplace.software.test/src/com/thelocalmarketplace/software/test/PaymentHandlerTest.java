@@ -22,8 +22,6 @@
  * Nami Marwah (UCID: 30178528)
  */
 
-//test
-
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
@@ -54,6 +52,7 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
@@ -812,7 +811,7 @@ public class PaymentHandlerTest {
         Coin coin2 = new Coin(currency, new BigDecimal("0.10"));
 
         // Load coins into dispenser
-        this.checkoutStationG.configureCoinDispenserCapacity(2);
+        AbstractSelfCheckoutStation.configureCoinDispenserCapacity(2);
         this.checkoutStationG = new SelfCheckoutStationGold();
         paymentHandlerG = new PaymentHandler(checkoutStationG, testOrder);
         checkoutStationG.plugIn(PowerGrid.instance());
@@ -832,7 +831,7 @@ public class PaymentHandlerTest {
         Coin coin2 = new Coin(currency, new BigDecimal("0.10"));
 
         // Load coins into dispenser
-        this.checkoutStationS.configureCoinDispenserCapacity(2);
+        AbstractSelfCheckoutStation.configureCoinDispenserCapacity(2);
         this.checkoutStationS = new SelfCheckoutStationSilver();
         paymentHandlerS = new PaymentHandler(checkoutStationS, testOrder);
         checkoutStationS.plugIn(PowerGrid.instance());
@@ -852,7 +851,7 @@ public class PaymentHandlerTest {
         Coin coin2 = new Coin(currency, new BigDecimal("0.10"));
 
         // Load coins into dispenser
-        this.checkoutStationB.configureCoinDispenserCapacity(2);
+        AbstractSelfCheckoutStation.configureCoinDispenserCapacity(2);
         this.checkoutStationB = new SelfCheckoutStationBronze();
         paymentHandlerB = new PaymentHandler(checkoutStationB, testOrder);
         checkoutStationB.plugIn(PowerGrid.instance());
