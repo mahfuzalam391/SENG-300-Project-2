@@ -282,6 +282,7 @@ public class DemoIterationTwo {
 
         } catch (Exception e) {
             System.out.println("Failed to initialize order: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             if (input != null) {
                 input.close();
