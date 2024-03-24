@@ -109,6 +109,7 @@ public class DemoIterationTwo {
         PowerGrid.engageUninterruptiblePowerSource();
         station.plugIn(PowerGrid.instance());
         station.coinStorage.activate();
+        station.coinSlot.activate();
 
         SelfCheckoutStationSoftware software = new SelfCheckoutStationSoftware();
 
