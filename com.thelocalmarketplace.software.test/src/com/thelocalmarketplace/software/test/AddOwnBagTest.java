@@ -24,6 +24,7 @@
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -105,9 +106,9 @@ public class AddOwnBagTest {
 	
 	@Test 
 	public void testAddBagWeightOverThreshold() throws OverloadedDevice { 
-	// scale is over the massLimit 
+	// scale with a mass limit of 40000000
 	mockScale scaleOverLimit = new mockScale(new Mass(40000000), new Mass(40000000));
-	//adding a new item to push scale over limit 
+	//adding a new item to exceed the mass limit 
 	scaleOverLimit.addAnItem(new MockItem(new Mass(45000000))); 
 	//adding bag (1 gram) to the over limit scale 
 	addOwnBag.addbagweight(order, scaleOverLimit, 1000000); 
@@ -117,11 +118,14 @@ public class AddOwnBagTest {
 	
 	
 	@Test
-	public void testAddBagWeightWithinThreshold() throws OverloadedDevice {
-		//BigDecimal threshholdLimit = new ; 
-		mockScale scaleInLimit = new mockScale(new Mass(30000000), new Mass(30000000));
-		scaleInLimit.addAnItem(new MockItem(new Mass(40000000)));  
-		addOwnBag.addbagweight(order, scaleInLimit, 10000000);
+	public void testAddBagWeightWithinThreshold() throws OverloadedDevice { 
+		mockScale scaleInLimit = new mockScale(new Mass(40000000), new Mass(40000000));
+		// adding an item to the scale that is within the mass limit 
+		scaleInLimit.addAnItem(new MockItem(new Mass(29000000)));  
+		// adding a bag that does not exceed the scaleInLimit mass limit
+		addOwnBag.addbagweight(order, scaleInLimit, 1000000);
+		//when the items are within the scale mass limit the system should not be blocked
+		assertFalse(SelfCheckoutStationSoftware.getStationBlock()); 
 	}
 }
 
