@@ -86,6 +86,7 @@ public class DemoIterationTwo {
         System.out.println("Enter '3' for bronze system.");
 
         int stationType = input.nextInt();
+        input.nextLine();
 
         // Initialize the station and scale
         switch (stationType) {
@@ -171,6 +172,7 @@ public class DemoIterationTwo {
                 System.out.print("Enter your choice (1/2/3/4): ");
 
                 int paymentChoice = input.nextInt();
+                input.nextLine();
 
                 switch (paymentChoice) {
                     case 1:
@@ -275,6 +277,7 @@ public class DemoIterationTwo {
             }
             // Proper closure of resources and final messages can be added here
             System.out.println("Thank you for using the self-checkout system.");
+            return;
 
         } catch (Exception e) {
             System.out.println("Failed to initialize order: " + e.getMessage());
