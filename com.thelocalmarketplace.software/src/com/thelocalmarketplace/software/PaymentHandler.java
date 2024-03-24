@@ -470,7 +470,8 @@ public class PaymentHandler {
 			else if (checkoutSystem instanceof SelfCheckoutStationGold) {
 				cardReader = new CardReaderGold();
 			}
-
+			cardReader.plugIn(PowerGrid.instance());
+			cardReader.turnOn();
 			CardData data = cardReader.swipe(card);
 
 			long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);
@@ -519,7 +520,8 @@ public class PaymentHandler {
 			else if (checkoutSystem instanceof SelfCheckoutStationGold) {
 				cardReader = new CardReaderGold();
 			}
-
+			cardReader.plugIn(PowerGrid.instance());
+			cardReader.turnOn();
 			CardData data = cardReader.swipe(card);
 
 			long holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountCharged);

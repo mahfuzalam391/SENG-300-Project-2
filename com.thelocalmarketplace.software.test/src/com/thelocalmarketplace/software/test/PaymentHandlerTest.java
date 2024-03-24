@@ -30,8 +30,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Currency;
 
 import org.junit.After;
@@ -43,6 +45,7 @@ import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.printer.ReceiptPrinterBronze;
 import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scanner.Barcode;
@@ -59,6 +62,7 @@ import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
+import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.PaymentHandler;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
@@ -1548,5 +1552,27 @@ public class PaymentHandlerTest {
         assertTrue(checkoutStationB.banknoteInput.isDisabled());
     }
 
-
+    @Test
+    public void testPayWithCreditViaSwipeHoldFailed() throws IOException, EmptyDevice, OverloadedDevice {
+        Card creditCard = new Card("Credit", "21", "Holder1", "211");
+        CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData("21", "Holder1", expiry, "211", 2000);
+        assertEquals(paymentHandlerG.payWithCreditViaSwipe(creditCard, 0, cardIssuer), -1);
+        assertEquals(paymentHandlerS.payWithCreditViaSwipe(creditCard, 0, cardIssuer), -1);
+    	assertEquals(paymentHandlerB.payWithCreditViaSwipe(creditCard, 0, cardIssuer), -1);
+    }
+    
+    @Test
+    public void testPayWithDebitViaSwipeHoldFailed() throws IOException, EmptyDevice, OverloadedDevice {
+    	Card debitCard = new Card("Debit", "12", "Holder2", "122");
+    	CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData("12", "Holder2", expiry, "122", 2000);
+        assertEquals(paymentHandlerG.payWithDebitViaSwipe(debitCard, 0, cardIssuer), -1);
+        assertEquals(paymentHandlerS.payWithDebitViaSwipe(debitCard, 0, cardIssuer), -1);
+        assertEquals(paymentHandlerB.payWithDebitViaSwipe(debitCard, 0, cardIssuer), -1);
+    }
 }
