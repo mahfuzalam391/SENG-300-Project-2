@@ -274,8 +274,8 @@ public class DemoIterationTwo {
             String receiptChoice = input.nextLine();
             
             if (receiptChoice.equalsIgnoreCase("Yes")) {
-                System.out.println("Should be printing below");
                 paymentHandler.receiptPrinter(order);
+                System.out.println();
             }
             // Proper closure of resources and final messages can be added here
             System.out.println("Thank you for using the self-checkout system.");
