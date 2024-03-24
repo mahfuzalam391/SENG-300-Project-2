@@ -89,6 +89,7 @@ public class PaymentHandlerTest {
     private ElectronicScaleBronze baggingArea;
     private Order testOrder;
     private PLUCodedProduct pluCodedProduct;
+    private long productPrice;
 
     @Before
     public void setUp() throws OverloadedDevice, EmptyDevice {
@@ -122,7 +123,7 @@ public class PaymentHandlerTest {
 
         // Initializing mock product (using same barcode as the barcoded item)
         String productDescription = "banana";
-        long productPrice = 5;
+        productPrice = 5;
         double productWeightInGrams = 1000;
         barcodedProduct = new BarcodedProduct(barcode, productDescription, productPrice, productWeightInGrams);
 
@@ -563,11 +564,18 @@ public class PaymentHandlerTest {
     }
 
     @Test
-    public void getChangeRemainingTest() throws Exception {
+    public void getChangeRemainingTest() {
         // Simulate exact payment
         assertEquals(paymentHandlerG.getChangeRemaining(), BigDecimal.ZERO);
         assertEquals(paymentHandlerS.getChangeRemaining(), BigDecimal.ZERO);
         assertEquals(paymentHandlerB.getChangeRemaining(), BigDecimal.ZERO);
+    }
+    
+    @Test
+    public void getTotalCostTest() {
+    	assertEquals(paymentHandlerG.getTotalCost(), BigDecimal.valueOf(productPrice));
+    	assertEquals(paymentHandlerS.getTotalCost(), BigDecimal.valueOf(productPrice));
+    	assertEquals(paymentHandlerB.getTotalCost(), BigDecimal.valueOf(productPrice));
     }
 
     @Test
