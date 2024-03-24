@@ -270,7 +270,7 @@ public class DemoIterationTwo {
                 }
             } // End of payment while loop
 
-            System.out.println("Would you like a receipt?");
+            System.out.println("Would you like a receipt? (Yes/No)");
             String receiptChoice = input.nextLine();
             
             if (receiptChoice.equalsIgnoreCase("Yes")) {
