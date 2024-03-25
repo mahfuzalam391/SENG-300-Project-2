@@ -27,12 +27,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.After;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,13 +43,11 @@ import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scale.ElectronicScaleGold;
 import com.jjjwelectronics.scale.ElectronicScaleSilver;
-import com.jjjwelectronics.scale.AbstractElectronicScale;
+
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
-import com.thelocalmarketplace.software.test.handleBulkyItemTest.MockItem;
 
-import powerutility.NoPowerException;
 import powerutility.PowerGrid;
 
 @RunWith(Parameterized.class)
