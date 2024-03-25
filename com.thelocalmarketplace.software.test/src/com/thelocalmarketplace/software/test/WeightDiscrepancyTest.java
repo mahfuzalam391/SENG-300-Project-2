@@ -47,7 +47,7 @@ import com.jjjwelectronics.scale.ElectronicScaleSilver;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
-import com.thelocalmarketplace.software.test.HandleTest.MockItem;
+
 
 import powerutility.PowerGrid;
 
