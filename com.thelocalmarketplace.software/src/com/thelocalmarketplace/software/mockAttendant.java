@@ -42,7 +42,7 @@ public class mockAttendant {
     }
     
     /** here the attendant fixes the problem, then sets the station to false and call the message 
-     * so that now the user can continue
+     * so that now the user can continue 
      */
     public void Attendant_corrected_problem() {
         // here the bag is approved

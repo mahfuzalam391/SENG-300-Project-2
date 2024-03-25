@@ -114,7 +114,7 @@ public class WeightDiscrepancy {
 	    } catch (OverloadedDevice e) {
 	        SelfCheckoutStationSoftware.setStationBlock(true);
 	    }
-	}
+	}  
 
     /**
      * Compares weight at block to current getWeight to check if an item has been removed.

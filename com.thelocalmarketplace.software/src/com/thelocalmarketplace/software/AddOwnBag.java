@@ -22,7 +22,7 @@ public class AddOwnBag {
 	/** In the constructor pass in order and scale, and add any unimplemented methods 
 	 * in electronic listener 
 	 * @param order
-	 * @param scale1
+	 * @param scale1 
 	 */
 	public AddOwnBag(Order order, AbstractElectronicScale scale1) {
 		electronicScaleListener = new ElectronicScaleListener () {
