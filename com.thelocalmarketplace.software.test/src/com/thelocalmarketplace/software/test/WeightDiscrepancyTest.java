@@ -499,8 +499,6 @@ public class WeightDiscrepancyTest {
      * Create test for handleBulkyItem with ONE bulky item, by creating an order and adding items + weights
      * Call handle bulky item, it should remove the weight of the second item
      * 
-     * Should we check the scale-using methods work with the updated TotalWeight?
-     * 
      * Tests all the scale types
      *  
      */
@@ -564,6 +562,16 @@ public class WeightDiscrepancyTest {
    		
    	}
    	
+   	/*
+     * 
+     * Create test for handleBulkyItem with MULTIPLE bulky item, by creating an order and adding items + weights
+     * Call handle bulky item, it should remove the weight of the second item
+     * 
+     * 
+     * Tests all the scale types
+     *  
+     */
+   	
    	@Test
    	public void testHandleMultipleBulkyItems() throws OverloadedDevice {
    		Order order = new Order(eScale);
@@ -587,6 +595,15 @@ public class WeightDiscrepancyTest {
    		
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
    	}
+   	
+   	/*
+     * 
+     * Create test for handleBulkyItem determines if the function works correctly when multiple of the same bulky item is added, by creating an order and adding items + weights
+     * Call handle bulky item, it should remove the weight of the second item
+     * 
+     * Tests all the scale types
+     *  
+     */
    	
    	@Test
    	public void testHandleSameBulkyItem() throws OverloadedDevice {
