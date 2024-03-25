@@ -193,7 +193,7 @@ public class WeightDiscrepancy {
 		double currentWeight = order.getTotalWeightInGrams();
 		double finalWeight = currentWeight-productWeight;
 		if (finalWeight < 0) order.addTotalWeightInGrams(0);
-		else order.addTotalWeightInGrams(finalWeight);
+		else order.addTotalWeightInGrams(-productWeight);
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
 }
