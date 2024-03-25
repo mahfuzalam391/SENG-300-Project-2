@@ -163,11 +163,6 @@ public class WeightDiscrepancy {
 	 * If blocked, will check if correct item was added/removed using setBlocked
 	 * Will unblock if weight change fixes the weight discrepancy
 	 */
-//	@Override
-//	public void notifyMassChanged() {
-//		super.notifyMassChanged();
-//		checkDiscrepancy();
-//	}
 
 	
 	public static void setStationBlock(boolean b) {
