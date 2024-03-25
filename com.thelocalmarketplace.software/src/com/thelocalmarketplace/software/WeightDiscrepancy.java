@@ -64,11 +64,8 @@ public class WeightDiscrepancy {
 	
 	/**
 	 * Updates the scale mass every time an item is added to or removed from the order
-	 */
-	/**
 	 * Records weight at time of discrepancy before block 
-	 */
-	
+	 */	
 	public void updateMass() {
 		for (Item item : items) {
 			scale.addAnItem(item);
@@ -91,6 +88,10 @@ public class WeightDiscrepancy {
 		
 	} 
 	
+	/**
+	 * Check if the system can be unblocked after it has been blocked 
+	 * Will only unblock if there is no detected weight discrepancy
+	 */
 	public void checkIfCanUnblock() {
 	    Mass actual;
 	    Mass expected;
@@ -157,14 +158,11 @@ public class WeightDiscrepancy {
 			return false; 
 		}
 	}
-	
-	/**
-	 * Called when the mass on the scale changes
-	 * If blocked, will check if correct item was added/removed using setBlocked
-	 * Will unblock if weight change fixes the weight discrepancy
-	 */
 
-	
+	/**
+	 * Block or unblock the system
+	 * @param b, the value of block
+	 */
 	public static void setStationBlock(boolean b) {
 		if (b == true) {
 			SelfCheckoutStationSoftware.setStationBlock(true);
@@ -187,8 +185,8 @@ public class WeightDiscrepancy {
 		System.out.println("Request has been approved");
 		double currentWeight = order.getTotalWeightInGrams();
 		double finalWeight = currentWeight-productWeight;
-		if (finalWeight < 0) order.addTotalWeightInGrams(0);
-		else order.addTotalWeightInGrams(-productWeight);
+		if (finalWeight < 0) order.addTotalWeightInGrams(0); // ensures that the expected total will not be negative
+		else order.addTotalWeightInGrams(-productWeight); // subtracts the product weight from the expected total
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
 }
