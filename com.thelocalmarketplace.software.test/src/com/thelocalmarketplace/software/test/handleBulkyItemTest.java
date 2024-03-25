@@ -26,124 +26,65 @@ import com.thelocalmarketplace.software.test.WeightDiscrepancyTest.MockItem;
 import powerutility.PowerGrid;
 
 
+@RunWith(Parameterized.class)
 public class handleBulkyItemTest {
+	private AbstractElectronicScale scale;
+	private PowerGrid grid;
 	
-	private Order orderB;
-	private Order orderG;
-	private Order orderS;
-	private ElectronicScaleBronze scaleBronze;
-	private ElectronicScaleGold scaleGold;
-	private ElectronicScaleSilver scaleSilver;
+	@Parameterized.Parameters
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][] {
+			{new ElectronicScaleGold()},
+			{new ElectronicScaleSilver()},
+			{new ElectronicScaleBronze()}
+		});
+	}
 	
+	public handleBulkyItemTest(AbstractElectronicScale scale) {
+		this.scale = scale;
+	}
 	
 	@Before
 	public void setUp() throws OverloadedDevice {
-		scaleBronze = new ElectronicScaleBronze();
-		scaleGold = new ElectronicScaleGold();
-		scaleSilver = new ElectronicScaleSilver();
-        PowerGrid grid = PowerGrid.instance();
-        scaleBronze.plugIn(grid);
-        scaleBronze.turnOn();
-        scaleBronze.enable();
-        scaleGold = new ElectronicScaleGold();
-        scaleGold.plugIn(grid);
-        scaleGold.turnOn();
-        scaleGold.enable();
-        scaleSilver = new ElectronicScaleSilver();
-        scaleSilver.plugIn(grid);
-        scaleSilver.turnOn();
-        scaleSilver.enable();
-        orderB = new Order(scaleBronze);
-        orderG = new Order(scaleGold);
-        orderS = new Order(scaleSilver);
-        
+		grid = PowerGrid.instance();
+		scale.plugIn(grid);
+		scale.turnOn();
+		scale.enable();
 	}
 
-    class MockItem extends Item {
-        public MockItem(Mass mass) {
-            super(mass);
-        }
-    }   
+    	class MockItem extends Item {
+        	public MockItem(Mass mass) {
+            	super(mass);
+        	}
+    	}   
 	
     
     /*
-     * BRONZE SCALE
      * 
-     * Create test for handleBulkyItem, by creating an order and adding items + weights
+     * Create test for handleBulkyItem with ONE bulky item, by creating an order and adding items + weights
      * Call handle bulky item, it should remove the weight of the second item
      * 
      * Should we check the scale-using methods work with the updated TotalWeight?
+     * 
+     * Tests all the scale types
      *  
      */
-    @Test
-  	public void testHandleBulkyItem_finalWeightB() throws OverloadedDevice {
+   	@Test
+  	public void testHandleBulkyItem_finalWeight() throws OverloadedDevice {
+    	Order order = new Order(scale);
         MockItem item1 = new MockItem(new Mass(10));
         MockItem item2 = new MockItem(new Mass(60));
 		
-        orderB.addItemToOrder(item1); 
-        scaleBronze.addAnItem(item1); 
-        orderB.addTotalWeightInGrams(10);
-        orderB.addItemToOrder(item2); 
-        orderB.addTotalWeightInGrams(60);
+        order.addItemToOrder(item1);
+        order.addTotalWeightInGrams(10);
+        order.addItemToOrder(item2); 
+        order.addTotalWeightInGrams(60);
        
              
-        WeightDiscrepancy.handleBulkyItem(orderB, 60);
+        WeightDiscrepancy.handleBulkyItem(order, 60);
                
         
         double expectedTotalWeight = 10;
-        assertEquals(expectedTotalWeight, orderB.getTotalWeightInGrams(), 0);
-  	}
-    
-    
-    /*
-     * GOLD SCALE
-     * 
-     * Create test for handleBulkyItem, by creating an order and adding items + weights
-     * Call handle bulky item, it should remove the weight of the second item
-     * 
-     */
-    @Test
-  	public void testHandleBulkyItem_finalWeightG () throws OverloadedDevice {
-        MockItem item1 = new MockItem(new Mass(10));
-        MockItem item2 = new MockItem(new Mass(60));
-		
-        orderG.addItemToOrder(item1); 
-        scaleGold.addAnItem(item1); 
-        orderG.addTotalWeightInGrams(10);
-        orderG.addItemToOrder(item2); 
-        orderG.addTotalWeightInGrams(60);
-       
-             
-        WeightDiscrepancy.handleBulkyItem(orderG, 60);
-               
-        
-        double expectedTotalWeight = 10;
-        assertEquals(expectedTotalWeight, orderG.getTotalWeightInGrams(), 0);
-  	}
-    
-    /*
-     * SILVER SCALE
-     * 
-     * Create test for handleBulkyItem, by creating an order and adding items + weights
-     * Call handle bulky item, it should remove the weight of the second item
-     * 
-     */
-    @Test
-  	public void testHandleBulkyItem_finalWeightS () throws OverloadedDevice {
-        MockItem item1 = new MockItem(new Mass(10));
-        MockItem item2 = new MockItem(new Mass(60));
-		
-        orderS.addItemToOrder(item1); 
-        scaleSilver.addAnItem(item1); 
-        orderS.addTotalWeightInGrams(10);
-        orderS.addItemToOrder(item2); 
-        orderS.addTotalWeightInGrams(60);
-       
-             
-        WeightDiscrepancy.handleBulkyItem(orderS, 60);
-               
-        
-        double expectedTotalWeight = 10;
-        assertEquals(expectedTotalWeight, orderS.getTotalWeightInGrams(), 0);
+        assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
   	}
 }
