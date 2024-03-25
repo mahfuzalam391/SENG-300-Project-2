@@ -14,6 +14,7 @@ import com.jjjwelectronics.scale.IElectronicScale;
 
 public class AddOwnBag {
 
+	// create instance
 	private ElectronicScaleListener electronicScaleListener;
 	
 
