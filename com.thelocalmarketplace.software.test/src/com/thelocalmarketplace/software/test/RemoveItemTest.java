@@ -2,6 +2,7 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.*;
 
+import com.jjjwelectronics.Item;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,10 @@ import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
 
 import powerutility.PowerGrid;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class RemoveItemTest {
 	PowerGrid grid;
@@ -120,6 +125,8 @@ public class RemoveItemTest {
 		orderSilver.addTotalWeightInGrams(productWeightInGrams);
 		orderSilver.addTotalPrice(productPrice);
 		scaleSilver.addAnItem(barcodedItem);
+
+		Scanner input = new Scanner(System.in);
 	}
 
 	// test that the weight in the order changed after the item is removed from order
@@ -228,6 +235,24 @@ public class RemoveItemTest {
 		// removeItemFromOrder should return false since the order is empty
 		assertFalse(orderSilver.removeItemFromOrder(barcodedItem));
 	}
+
+	@Test
+	public void testSignalToRemoveItemFromOrderBronze() throws OverloadedDevice {
+		ArrayList<Item> orderBeforeRemoval = orderBronze.getOrder();
+
+		int lengthBefore = orderBeforeRemoval.size();
+
+		String inputData = "1";
+		System.setIn(new java.io.ByteArrayInputStream(inputData.getBytes()));
+		Scanner testInput = new Scanner(System.in);
+		orderBronze.signalToRemoveItemFromOrder(testInput);
+
+		ArrayList<Item> orderAfterRemoval = orderBronze.getOrder();
+		int lengthAfter = orderAfterRemoval.size();
+
+		assertEquals(lengthAfter, lengthBefore - 1);
+	}
+
 	@After
 	public void tearDown() {
 		// deregister BaggingAreaListeners
