@@ -245,7 +245,13 @@ public class DemoIterationTwo {
                 BarcodedItem removed = order.signalToRemoveItemFromOrder(input);
                 
                 // remove from scale
-                scale.removeAnItem(removed);
+                scale.removeAnItem(removed);		// error in this line
+                // when you add an item and then remove the item, the item does get removed from the order list but throws different error
+                // Sometimes index out of bound or sometimes 
+                //Failed to initialize order: The item was not found amongst those on the scale.
+//                ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException: The item was not found amongst those on the scale.
+//            	at com.jjjwelectronics.scale.AbstractElectronicScale.removeAnItem(AbstractElectronicScale.java:94)
+//            	at com.thelocalmarketplace.software.DemoIterationTwo.main(DemoIterationTwo.java:248)
                
             }
             
