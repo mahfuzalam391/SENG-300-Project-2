@@ -190,7 +190,7 @@ public class Order {
 	 */
 	public void signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
-		System.out.println("Please select the item you want to remove from the order.");
+		System.out.println("Please select the item you want to remove from the order as a number from the order list.");
 
 		displayOrder(); // Displays the order to the customer
 
@@ -227,7 +227,7 @@ public class Order {
 	}
 
 	/**
-	 * Display the order to the customer
+	 * Display the order to the customer one by one from the list of items in the order
 	 */
 	public void displayOrder(){
 		System.out.println("\nOrder details:\n");
