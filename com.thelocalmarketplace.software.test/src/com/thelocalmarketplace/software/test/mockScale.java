@@ -47,6 +47,7 @@ public class mockScale extends AbstractElectronicScale {
 	public mockScale(Mass limit, Mass sensitivityLimit) {
 		super(limit, sensitivityLimit);
 		sensitivityLimit1 = limit;  
+		massLimit = limit; 
 		// TODO Auto-generated constructor stub
 	}
 
