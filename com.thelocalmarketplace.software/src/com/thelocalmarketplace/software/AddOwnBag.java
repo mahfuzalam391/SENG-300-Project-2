@@ -14,14 +14,7 @@ import com.jjjwelectronics.scale.IElectronicScale;
 
 public class AddOwnBag {
 
-	// allow customer to add their own bags to bagging area without causing a weight discrepancy
-	
-	
-	// 1. customer decides to make use of their own bags, activating an appropriate control to thier station
-			// some sort of button, add listener 
-	
-	
-	
+	// create instance
 	private ElectronicScaleListener electronicScaleListener;
 	
 

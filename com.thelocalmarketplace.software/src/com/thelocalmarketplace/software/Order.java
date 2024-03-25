@@ -146,6 +146,7 @@ public class Order {
 
 	/**
 	 * Adds an item to the order via barcode scan
+	 * Accounting for Bronze, Silver and Gold checkout Stations
 	 */
 	public void addItemViaBarcodeScan(Barcode barcode) {
 		// Gets the product from the hardware's database
@@ -155,7 +156,7 @@ public class Order {
 		//Makes sure that the product that is recieved from the barcode 
 		// Is not null, therefore making sure it exists.
 		if (product != null) {
-			//Gets both the products weight and price
+			//Gets both the products price and weight
 			double productWeight = product.getExpectedWeight(); 
 			long productPrice = product.getPrice();
 
@@ -177,10 +178,10 @@ public class Order {
 
 	/**
 	 * Checks for weight discrepancy, is called by the baggingAreaListener after an item is added to the bagging area scale
+	 * and the signalToRemoveItemFromOrder after the item is removed from the order.
 	 * @throws OverloadedDevice
 	 */
 	public void checkForDiscrepancy() throws OverloadedDevice {
-		// This method is called by the baggingAreaListener after an item is added to the bagging area scale
 		WeightDiscrepancy weightDiscrepancy = new WeightDiscrepancy(this, scale);
 
 		weightDiscrepancy.checkIfCanUnblock(); // Checks for a weight discrepancy, if none, it unblocks the system

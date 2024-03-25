@@ -47,7 +47,7 @@ import powerutility.NoPowerException;
 import powerutility.PowerGrid;
 
 
-public class WeightDiscrepancyTest {           
+public class WeightDiscrepancyTest {            
 	
 	private WeightDiscrepancy weightDiscrepancy;
 	private Order order; 

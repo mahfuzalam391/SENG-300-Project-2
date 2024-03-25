@@ -179,6 +179,7 @@ public class AddItemViaBarcodeScanTest {
 		//Creates a fake barcode 
 		Numeral[] nonExistentBarcodeDigits = {Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven};
 		Barcode nonExistentBarcode = new Barcode(nonExistentBarcodeDigits);
+		//Sets a mass to the fake barcode (fakeMass) that will be used
 		Mass fakeMass = new Mass(1000000000); 
 		barcodedItem = new BarcodedItem(nonExistentBarcode, fakeMass);
 		// Scans the fake barcode, that should not be linked to a product
@@ -209,8 +210,8 @@ public class AddItemViaBarcodeScanTest {
 	@Test
 	public void testGetOrderWhenNotEmpty() {
 		testOrder.addItemToOrder(barcodedItem);
-
 		ArrayList<Item> order = testOrder.getOrder();
+		//Checks if the order does indeed contain the instance product that was added
 		assertTrue(order.contains(barcodedItem));
 	}
 	@Test
