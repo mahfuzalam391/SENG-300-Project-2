@@ -47,6 +47,7 @@ import com.jjjwelectronics.scale.ElectronicScaleSilver;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
+import com.thelocalmarketplace.software.test.HandleTest.MockItem;
 
 import powerutility.PowerGrid;
 
@@ -68,9 +69,12 @@ public class WeightDiscrepancyTest {
      
     /** Create before test for set up that initializes scale, order and weight Discrepancy
      * @throws OverloadedDevice */
+	
+	
 	 
 	@Before
 	public void setUp() throws OverloadedDevice {   
+		
 		 		
 	        scale = new mockScale(new Mass(40000000),new Mass(40000000));  
 	        PowerGrid grid = PowerGrid.instance();
@@ -84,6 +88,7 @@ public class WeightDiscrepancyTest {
 	        eScale.plugIn(grid);
 	        eScale.turnOn();
 	        eScale.enable();
+	        order5 = new Order(eScale);
     }
 	
 	  	
@@ -212,22 +217,33 @@ public class WeightDiscrepancyTest {
      */
 	@Test
 	public void unBlockTest() throws Exception {
+    	scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
+        PowerGrid grid = PowerGrid.instance();
+        scale5.plugIn(grid);
+        scale5.turnOn();
+        scale5.enable();
+        
+      
+        order5 = new Order(scale5);
+     
 		
-        order4 = new Order(eScale);
-        weightDiscrepancy4 = new WeightDiscrepancy(order4, eScale);   
+   
+        weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);   
     	
     	 MockItem item1 = new MockItem(new Mass(100));
          MockItem item2 = new MockItem(new Mass(150));
+         scale5.addAnItem(item1);
     	
-         order4.addItemToOrder(item1);
-         order4.addItemToOrder(item2);
-         eScale.addAnItem(item1);
+         order5.addItemToOrder(item1);
+         order5.addItemToOrder(item2);
+        
           
         weightDiscrepancy4.checkIfCanUnblock();
         
         assertFalse(SelfCheckoutStationSoftware.getStationBlock());     
         
             }
+	
 		
 	
 	
@@ -441,7 +457,9 @@ public class WeightDiscrepancyTest {
      * Tests all the scale types
      *  
      */
-   	@Test
+ 
+   	
+	@Test
   	public void testHandleBulkyItem_finalWeight() throws OverloadedDevice {
     	Order order = new Order(eScale);
         MockItem item1 = new MockItem(new Mass(10));
@@ -518,4 +536,11 @@ public class WeightDiscrepancyTest {
    		
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
    	}
+   	
+   	
+   	
+   	
+    
+   	
+   	
 }

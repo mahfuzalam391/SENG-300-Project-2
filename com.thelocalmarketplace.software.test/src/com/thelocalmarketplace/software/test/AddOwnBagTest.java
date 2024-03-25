@@ -198,7 +198,8 @@ public class AddOwnBagTest {
 	            @Override
 	            
 	            public Mass getCurrentMassOnTheScale() throws OverloadedDevice {
-	                throw new OverloadedDevice();
+	            	throw new OverloadedDevice();
+	        
 	            }
 	            @Override         
 	            public Mass getMassLimit() {
@@ -209,7 +210,13 @@ public class AddOwnBagTest {
 	        AddOwnBag addOwnBag = new AddOwnBag(order, scale);
 	        addOwnBag.addbagweight(order, scale, weightOfBag);		
 			assertFalse(false);  
+			
+		
 	    }
+	
+	
+	
+
 	
 
 }

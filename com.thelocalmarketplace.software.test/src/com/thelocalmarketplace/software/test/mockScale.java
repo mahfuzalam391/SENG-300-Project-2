@@ -43,9 +43,10 @@ import powerutility.NoPowerException;
 import powerutility.PowerGrid;
 
 public class mockScale extends AbstractElectronicScale {
-	protected mockScale(Mass limit, Mass sensitivityLimit) {
+	protected Mass sensitivityLimit1;
+	public mockScale(Mass limit, Mass sensitivityLimit) {
 		super(limit, sensitivityLimit);
-		this.massLimit = limit;  
+		sensitivityLimit1 = limit;  
 		// TODO Auto-generated constructor stub
 	}
 
@@ -63,7 +64,7 @@ public class mockScale extends AbstractElectronicScale {
 
     @Override
     public Mass getSensitivityLimit() {
-        return sensitivityLimit;
+        return sensitivityLimit1;
     }
 
     @Override
