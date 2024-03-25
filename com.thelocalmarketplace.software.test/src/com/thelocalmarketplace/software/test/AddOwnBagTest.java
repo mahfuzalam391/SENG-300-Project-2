@@ -25,6 +25,7 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -32,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +43,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.software.AddOwnBag;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
@@ -53,17 +56,15 @@ public class AddOwnBagTest {
 	private AddOwnBag addOwnBag; //object under test 
 	private mockScale scale;
 	private Mass massLimit; 
-	
+  
 
-	
-
-	
 	@Before
 	public void setUp() throws OverloadedDevice { 
 		scale = new mockScale(new Mass(40000000),new Mass(40000000));
 		order = new Order(scale);  
 		massLimit = scale.getMassLimit();
 		addOwnBag = new AddOwnBag(order, scale); 
+		
 	}
 
 	
@@ -171,6 +172,45 @@ public class AddOwnBagTest {
         Assert.assertEquals("You may now continue", outputStreamCaptor.toString().trim()); 
         //https://stackoverflow.com/questions/1119385/junit-test-for-system-out-println
     }
+	
+	
+	@Test
+    public void testWhenOverloadedDeviceThrown_1() {
+        
+        AbstractElectronicScale scale = new AbstractElectronicScale(massLimit, massLimit) {
+            @Override
+           
+            public Mass getCurrentMassOnTheScale() throws OverloadedDevice {
+                throw new OverloadedDevice();
+            }
+        };  
+        AddOwnBag addOwnBag = new AddOwnBag(order, scale);
+        double bagWeight = addOwnBag.getBagWeight(order, scale);
+        assertEquals(0.0, bagWeight, 0.001); // Verify that bag weight is 0
+    }
+	
+	 
+	
+	@Test
+	    public void testOverloadedDeviceThrown_2() throws OverloadedDevice {      
+	        AbstractElectronicScale scale = new AbstractElectronicScale(massLimit, massLimit) {
+	            @Override
+	            
+	            public Mass getCurrentMassOnTheScale() throws OverloadedDevice {
+	                throw new OverloadedDevice();
+	            }
+	            @Override         
+	            public Mass getMassLimit() {
+	               return new Mass(BigInteger.valueOf(1000000)); 
+	            }
+	        };
+	        double weightOfBag = 50.0;      
+	        AddOwnBag addOwnBag = new AddOwnBag(order, scale);
+	        addOwnBag.addbagweight(order, scale, weightOfBag);		
+			assertFalse(false);  
+	    }
+	
+
 }
 
 
