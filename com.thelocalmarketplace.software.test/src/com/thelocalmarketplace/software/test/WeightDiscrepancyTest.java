@@ -47,7 +47,7 @@ import com.jjjwelectronics.scale.ElectronicScaleSilver;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
-import com.thelocalmarketplace.software.test.HandleTest.MockItem;
+//import com.thelocalmarketplace.software.test.HandleTest.MockItem;
 
 import powerutility.PowerGrid;
 
@@ -503,6 +503,9 @@ public class WeightDiscrepancyTest {
    	@Test
    	public void emptyOrderBulkyItem() throws OverloadedDevice{
    		Order order = new Order(eScale);
+   		MockItem item1 = new MockItem(new Mass(79));
+   		order.addItemToOrder(item1);
+   		order.addTotalWeightInGrams(79);
    		
    		WeightDiscrepancy.handleBulkyItem(order, 79);
    		
@@ -511,6 +514,10 @@ public class WeightDiscrepancyTest {
    		
    	}
    	
+   	/* 
+   	 * Create a test to handle multiple bulky items being added to order
+   	 * The system should change the expected total weight as necessary 
+   	 */
    	@Test
    	public void testHandleMultipleBulkyItems() throws OverloadedDevice {
    		Order order = new Order(eScale);
@@ -533,12 +540,5 @@ public class WeightDiscrepancyTest {
    		double expectedTotalWeight = 10;
    		
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
-   	}
-   	
-   	
-   	
-   	
-    
-   	
-   	
+   	} 	
 }

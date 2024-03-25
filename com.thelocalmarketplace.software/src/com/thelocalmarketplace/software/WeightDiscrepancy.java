@@ -185,8 +185,7 @@ public class WeightDiscrepancy {
 		System.out.println("Request has been approved");
 		double currentWeight = order.getTotalWeightInGrams();
 		double finalWeight = currentWeight-productWeight;
-		if (finalWeight < 0) order.addTotalWeightInGrams(0); // ensures that the expected total will not be negative
-		else order.addTotalWeightInGrams(-productWeight); // subtracts the product weight from the expected total
+		if (finalWeight >= 0) order.addTotalWeightInGrams(-productWeight); // ensures that the expected total will not be negative
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
 }
