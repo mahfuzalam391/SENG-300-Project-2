@@ -1,27 +1,25 @@
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collection;
 
-
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Before; 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scale.ElectronicScaleGold;
 import com.jjjwelectronics.scale.ElectronicScaleSilver;
 import com.thelocalmarketplace.software.Order;
-import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
+
 import com.thelocalmarketplace.software.WeightDiscrepancy;
-import com.thelocalmarketplace.software.test.WeightDiscrepancyTest.MockItem;
 
 import powerutility.PowerGrid;
 
@@ -87,4 +85,40 @@ public class handleBulkyItemTest {
         double expectedTotalWeight = 10;
         assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
   	}
+   	
+   	/*
+     * Create a test to ensure that the system handles if the weight of the bulky item is 0 (by error)
+     *  
+     */
+   	
+   	@Test
+   	public void zeroWeightBulkyItem() throws OverloadedDevice{
+   		Order order = new Order(scale);
+   		MockItem item1 = new MockItem(new Mass(10));
+   		order.addItemToOrder(item1);
+        order.addTotalWeightInGrams(10);
+        
+        WeightDiscrepancy.handleBulkyItem(order, 0);
+        double expectedTotalWeight = 10;
+        assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   	}
+   	
+   	/*
+     * Create a test to ensure that the system handles it when the bulky item is the first item added 
+     * 
+     * The system should not crash and it should correctly adjust the weight 
+     *  
+     */
+   	
+   	@Test
+   	public void emptyOrderBulkyItem() throws OverloadedDevice{
+   		Order order = new Order(scale);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 79);
+   		
+   		double expectedTotalWeight = 0;
+        assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   		
+   	}
+   	
 }
