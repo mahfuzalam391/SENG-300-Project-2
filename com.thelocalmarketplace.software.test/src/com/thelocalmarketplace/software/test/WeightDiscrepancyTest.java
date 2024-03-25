@@ -147,22 +147,30 @@ public class WeightDiscrepancyTest {
 
     @Test
     public void testcheckDiscrepancy_diff() throws OverloadedDevice {
-    	 scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
+    	 
+    	// Create new scale & enable + turn on hardware
+    	scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
          scale5.enable();
          
+         // Define item mass, item, and add to scale
          Mass mass1 = new Mass(5000000);
          MockItem item1 = new MockItem(mass1); 
          scale5.addAnItem(item1); 
+         
+         // Initialize new order with items on scale5
          order5 = new Order(scale5);
         
+         // Add incorrect weight to order >> there will be a discrepancy
          order5.addTotalWeightInGrams(2);  
        
+         // Create weight discrepancy instance with current test's order and scale
          weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);  
          weightDiscrepancy4.checkDiscrepancy();
         
+         // Checks to see if station is blocked due to discrepancy
          assertTrue(SelfCheckoutStationSoftware.getStationBlock());     
         
             }
@@ -180,21 +188,27 @@ public class WeightDiscrepancyTest {
     @Test
     public void testcheckDiscrepancy_same() throws OverloadedDevice {
     
-    	scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
+    	// Create new scale & enable + turn on hardware
+    	 scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
          PowerGrid grid = PowerGrid.instance();
          scale5.plugIn(grid);
          scale5.turnOn();
          scale5.enable();
          
+         // Define item mass, item, and add to scale
          Mass mass1 = new Mass(5000000);
          MockItem item1 = new MockItem(mass1); 
          scale5.addAnItem(item1); 
+         
+         // Initialize new order with items on scale five.
          order5 = new Order(scale5);
-      
+         
+         // Assign correct weight in grams for item1 in grams
          order5.addTotalWeightInGrams(5);  
       
+         // Call weight discrepancy with test's order and scale
          weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);  
-         weightDiscrepancy.checkDiscrepancy();
+         weightDiscrepancy4.checkDiscrepancy();
         
         assertFalse(SelfCheckoutStationSoftware.getStationBlock());     
         
@@ -211,55 +225,70 @@ public class WeightDiscrepancyTest {
     @Test
     public void testCheckRemoval_greaterthan() throws OverloadedDevice {
     	
-            
+        // Create new items with different masses    
         MockItem item1 = new MockItem(new Mass(100));
         MockItem item2 = new MockItem(new Mass(1000));
         MockItem item3 = new MockItem(new Mass(6000));
         
+        // Add items to order
         order.addItemToOrder(item1); 
         order.addItemToOrder(item2);
         order.addItemToOrder(item3);
         
+        // Add items to scale >> add item1 TWICE
         scale.addAnItem(item1);
-            
-        
+        scale.addAnItem(item1);
+        scale.addAnItem(item2);
+        scale.addAnItem(item3);
+      
+        // Call checkDiscrepancy as the weight on scale != order weight
+        // This captures the weight at block as 7200
         weightDiscrepancy.checkDiscrepancy(); 
         
+        // Checks if scale weight is <7200 (meaning item has been removed)
+        // This does NOT mean its unblocked
         assertFalse(weightDiscrepancy.checkRemoval());    
     }  
 
-    /** Create a test for ublock test that adds 2 items to an order but only adds one item to the scale 
+    /** Create a test for nublock test that adds 2 items to an order but only adds one item to the scale 
      * then when we call unblock function, because there is a difference in weight and do assertFalse
      * @throws Exception
      */
 	@Test
 	public void unBlockTest() throws Exception {
+		
+		// Create new scale & enable + turn on hardware
     	scale5 = new mockScale(new Mass(6000000),new Mass (6000000));
         PowerGrid grid = PowerGrid.instance();
         scale5.plugIn(grid);
         scale5.turnOn();
         scale5.enable();
         
-      
+        // Initialize new order with items on scale five.
         order5 = new Order(scale5);
-     
-		
-   
-        weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);   
     	
+        // Create new items 
     	 MockItem item1 = new MockItem(new Mass(100));
          MockItem item2 = new MockItem(new Mass(150));
+         
+         // Only add item1 to scale 
+         // Scale mass = 100
          scale5.addAnItem(item1);
     	
+         // Add both items to order
+         // Order mass = 250
          order5.addItemToOrder(item1);
          order5.addItemToOrder(item2);
-        
-          
+         
+         // Create variable for weightDiscrepancy using current test's order and scale
+         weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);   
+         
+         // Check if discrepancy has been resolved 
         weightDiscrepancy4.checkIfCanUnblock();
         
         assertFalse(SelfCheckoutStationSoftware.getStationBlock());     
         
-            }
+}
 	
 		
 	
