@@ -173,10 +173,10 @@ public class Order {
 
 	/**
 	 * Checks for weight discrepancy, is called by the baggingAreaListener after an item is added to the bagging area scale
+	 * and the signalToRemoveItemFromOrder after the item is removed from the order.
 	 * @throws OverloadedDevice
 	 */
 	public void checkForDiscrepancy() throws OverloadedDevice {
-		// This method is called by the baggingAreaListener after an item is added to the bagging area scale
 		WeightDiscrepancy weightDiscrepancy = new WeightDiscrepancy(this, scale);
 
 		weightDiscrepancy.checkIfCanUnblock(); // Checks for a weight discrepancy, if none, it unblocks the system
