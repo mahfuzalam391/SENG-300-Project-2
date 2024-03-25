@@ -24,33 +24,35 @@
 
 package com.thelocalmarketplace.software;
 
-import static com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation.resetConfigurationToDefaults;
-
-import java.io.IOException;
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
+import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.card.Card;
-import com.tdc.AbstractComponent;
-import com.tdc.CashOverloadException;
-import com.tdc.DisabledException;
-import com.tdc.NoCashAvailableException;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.ElectronicScaleBronze;
+import com.jjjwelectronics.scale.ElectronicScaleGold;
+import com.jjjwelectronics.scale.ElectronicScaleSilver;
+import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
-import com.tdc.coin.CoinDispenserGold;
-import com.tdc.coin.CoinStorageUnit;
-import com.jjjwelectronics.*;
-import com.jjjwelectronics.scanner.*;
-import com.jjjwelectronics.scale.*;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.*;
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
 import powerutility.PowerGrid;
-
-import java.math.BigDecimal;
 
 
 /**
