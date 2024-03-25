@@ -143,6 +143,7 @@ public class Order {
 
 	/**
 	 * Adds an item to the order via barcode scan
+	 * Accounting for Bronze, Silver and Gold checkout Stations
 	 */
 	public void addItemViaBarcodeScan(Barcode barcode) {
 		// Gets the product from the hardware's database

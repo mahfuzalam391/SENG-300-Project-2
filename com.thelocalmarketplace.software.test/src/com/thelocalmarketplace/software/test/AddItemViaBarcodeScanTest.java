@@ -209,8 +209,8 @@ public class AddItemViaBarcodeScanTest {
 	@Test
 	public void testGetOrderWhenNotEmpty() {
 		testOrder.addItemToOrder(barcodedItem);
-
 		ArrayList<Item> order = testOrder.getOrder();
+		//Checks if the order does indeed contain the instance product that was added
 		assertTrue(order.contains(barcodedItem));
 	}
 	@Test

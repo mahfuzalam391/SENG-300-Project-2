@@ -56,21 +56,21 @@ public class RemoveItemTest {
 		PowerGrid.engageUninterruptiblePowerSource();
 		grid.forcePowerRestore();
 
-		// set up the scales
+		// set up the scales for bronze, gold and silver
 		scaleBronze = new ElectronicScaleBronze();
 		scaleBronze.plugIn(grid);
 		scaleBronze.turnOn();
 		scaleBronze.enable();
+		
+		scaleSilver = new ElectronicScaleSilver();
+		scaleSilver.plugIn(grid);
+		scaleSilver.turnOn();
+		scaleSilver.enable();
 
 		scaleGold = new ElectronicScaleGold();
 		scaleGold.plugIn(grid);
 		scaleGold.turnOn();
 		scaleGold.enable();
-
-		scaleSilver = new ElectronicScaleSilver();
-		scaleSilver.plugIn(grid);
-		scaleSilver.turnOn();
-		scaleSilver.enable();
 
 		// Initialize a mock barcoded item that will be added to each order
 		Numeral[] barcodeDigits = {Numeral.one, Numeral.two, Numeral.three, Numeral.four, Numeral.five};
@@ -242,6 +242,7 @@ public class RemoveItemTest {
 
 		int lengthBefore = orderBeforeRemoval.size(); // get the length of the order list before removal
 
+		
 		String inputData = "1"; // remove the first item in the order
 		System.setIn(new java.io.ByteArrayInputStream(inputData.getBytes()));
 		Scanner testInput = new Scanner(System.in);
@@ -305,18 +306,20 @@ public class RemoveItemTest {
 		scaleGold.deregister(baggingAreaListenerGold);
 		scaleSilver.deregister(baggingAreaListenerBronze);
 
-		// disable, turnOff and unplug scales
+		// disable, turnOff and unplug scales for all bronze, silver and gold
 		scaleBronze.disable();
 		scaleBronze.turnOff();
 		scaleBronze.unplug();
+		
+		scaleSilver.disable();
+		scaleSilver.turnOff();
+		scaleSilver.unplug();
 
 		scaleGold.disable();
 		scaleGold.turnOff();
 		scaleGold.unplug();
 
-		scaleSilver.disable();
-		scaleSilver.turnOff();
-		scaleSilver.unplug();
+		
 	}
 
 }
