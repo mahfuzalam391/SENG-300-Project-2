@@ -193,7 +193,13 @@ public class Order {
 
 		displayOrder(); // Displays the order to the customer
 
-		String itemToRemove = scanner.nextLine();
+		String itemToRemove = scanner.nextLine(); // this will be the order number of the item to remove
+
+		// example:
+		// 1. Banana
+		// 2. Apple
+		// 3. Orange
+		// removing "1" will remove banana from the order
 
 		// check if there is an active session
 		if (SelfCheckoutStationSoftware.getStationActive()) {
@@ -219,15 +225,19 @@ public class Order {
 		checkForDiscrepancy();
 	}
 
+	/**
+	 * Display the order to the customer
+	 */
 	public void displayOrder(){
+		System.out.println("\nOrder details:\n");
 		// list the items in order
 		for (int i = 1; i <= order.size(); i++) {
 			Barcode barcode = ((BarcodedItem) order.get(i - 1)).getBarcode();
 
 			BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
-			System.out.println(i + ". " + "(What is this " + order.get(i - 1).toString() + ") " + product.getDescription() + " " + product.getPrice() + " " + product.getExpectedWeight());
+			System.out.println(i + ". " + product.getDescription() + "\nPrice of product: $" + product.getPrice() + "\nWeight of product: " + product.getExpectedWeight());
 		}
-		System.out.println("Total price: " + getTotalPrice() + " Total weight: " + getTotalWeightInGrams());
+		System.out.println("\nTotal price: " + getTotalPrice() + "\nTotal weight: " + getTotalWeightInGrams() + " \n");
 	}
 
 }

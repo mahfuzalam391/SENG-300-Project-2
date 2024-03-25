@@ -238,14 +238,14 @@ public class RemoveItemTest {
 
 	@Test
 	public void testSignalToRemoveItemFromOrderBronze() throws OverloadedDevice {
-		ArrayList<Item> orderBeforeRemoval = orderBronze.getOrder();
+		ArrayList<Item> orderBeforeRemoval = orderBronze.getOrder(); // get the order list before removal
 
-		int lengthBefore = orderBeforeRemoval.size();
+		int lengthBefore = orderBeforeRemoval.size(); // get the length of the order list before removal
 
-		String inputData = "1";
+		String inputData = "1"; // remove the first item in the order
 		System.setIn(new java.io.ByteArrayInputStream(inputData.getBytes()));
 		Scanner testInput = new Scanner(System.in);
-		orderBronze.signalToRemoveItemFromOrder(testInput);
+		orderBronze.signalToRemoveItemFromOrder(testInput); // remove the item from the order
 
 		ArrayList<Item> orderAfterRemoval = orderBronze.getOrder();
 		int lengthAfter = orderAfterRemoval.size();
