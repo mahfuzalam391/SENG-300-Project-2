@@ -540,5 +540,23 @@ public class WeightDiscrepancyTest {
    		double expectedTotalWeight = 10;
    		
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
-   	} 	
+   	}
+   	
+   	@Test
+   	public void testHandleBulkyItem_removeWrongWeight() throws OverloadedDevice {
+   		Order order = new Order(eScale);
+   		MockItem item1 = new MockItem(new Mass(10));
+   		MockItem bulkyItem1 = new MockItem(new Mass(60));
+   		
+   		order.addItemToOrder(item1);;
+   		order.addTotalWeightInGrams(10);
+   		
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(60);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 70);
+   		
+   		weightDiscrepancy.checkIfCanUnblock();
+   		assertFalse(SelfCheckoutStationSoftware.getStationBlock());
+   	}
 }
