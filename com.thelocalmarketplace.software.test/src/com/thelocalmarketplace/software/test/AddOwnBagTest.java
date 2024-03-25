@@ -174,6 +174,7 @@ public class AddOwnBagTest {
     }
 	
 	
+	//overload test 1
 	@Test
     public void testWhenOverloadedDeviceThrown_1() {
         
@@ -190,7 +191,7 @@ public class AddOwnBagTest {
     }
 	
 	 
-	
+	// overload test 2
 	@Test
 	    public void testOverloadedDeviceThrown_2() throws OverloadedDevice {      
 	        AbstractElectronicScale scale = new AbstractElectronicScale(massLimit, massLimit) {
