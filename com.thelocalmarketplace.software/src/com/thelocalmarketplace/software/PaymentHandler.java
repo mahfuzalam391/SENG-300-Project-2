@@ -70,7 +70,7 @@ public class PaymentHandler {
 
 	public BigDecimal amountSpent;
 	public BigDecimal changeRemaining = BigDecimal.ZERO;
-	public BigDecimal totalCost = new BigDecimal(0);
+	public BigDecimal totalPrice = new BigDecimal(0);
 	public BigDecimal amountInserted;
 	private AbstractSelfCheckoutStation checkoutSystem = null;
 	private ArrayList<Item> allItemOrders;
@@ -89,7 +89,7 @@ public class PaymentHandler {
 		else if (station instanceof SelfCheckoutStationGold)
 			this.checkoutSystem = (SelfCheckoutStationGold) station;
 		this.allItemOrders = order.getOrder();
-		this.totalCost = BigDecimal.valueOf(order.getTotalPrice());
+		this.totalPrice = BigDecimal.valueOf(order.getTotalPrice());
 		this.printerBronze = new ReceiptPrinterBronze();
 		this.printerBronze.plugIn(PowerGrid.instance());
 		this.printerBronze.turnOn();
@@ -113,14 +113,6 @@ public class PaymentHandler {
 		return this.changeRemaining;
 	}
 
-	/**
-	 * Obtain the total cost of the purchase.
-	 * @return the total cost
-	 */
-	public BigDecimal getTotalCost() {
-		return this.totalCost;
-	}
-
 
 	/**
 	 * Processes payment using coins inserted by the customer.
@@ -131,8 +123,6 @@ public class PaymentHandler {
 	 * @throws CashOverloadException    If the cash storage is overloaded.
 	 * @throws NoCashAvailableException If no cash is available for dispensing
 	 *                                  change.
-	 * @throws OutOfInkException
-	 * @throws OutOfPaperException
 	 * @throws OverloadedDevice
 	 * @throws EmptyDevice
 	 */
@@ -153,15 +143,15 @@ public class PaymentHandler {
 		}
 
 
-		if (value.compareTo(this.totalCost) < 0)
+		if (value.compareTo(this.totalPrice) < 0)
 			return false; // Return false if the total value of valid coins is less than the total cost.
 
 			// Return true if accurate change is dispensed.
 		else{
-			BigDecimal changeValue = value.subtract(this.totalCost);
+			BigDecimal changeValue = value.subtract(this.totalPrice);
 			if(dispenseAccurateChange(changeValue)) {
 				this.changeRemaining = changeValue;
-				this.amountSpent = this.totalCost;
+				this.amountSpent = this.totalPrice;
 				return true;
 			}
 			else
@@ -190,7 +180,7 @@ public class PaymentHandler {
 
 		//checks if the amount that was accepted is enough to make total cost go to 0 meaning that there was enough money to be
 		//paid if not then return false ,s they will need to pay again
-		if(valueOfAllAcceptedBanknotes.compareTo(this.totalCost) < 0){
+		if(valueOfAllAcceptedBanknotes.compareTo(this.totalPrice) < 0){
 			return false;
 		}// i need to return change
 
@@ -198,10 +188,10 @@ public class PaymentHandler {
 		// have to calculate the change value
 
 		else{
-			BigDecimal changeValue = valueOfAllAcceptedBanknotes.subtract(this.totalCost);
+			BigDecimal changeValue = valueOfAllAcceptedBanknotes.subtract(this.totalPrice);
 			if(dispenseAccurateChange(changeValue)) {
 				this.changeRemaining = changeValue;
-				this.amountSpent = this.totalCost;
+				this.amountSpent = this.totalPrice;
 				return true;
 			}
 			else
@@ -221,8 +211,6 @@ public class PaymentHandler {
 	 * @throws CashOverloadException    If the cash storage is overloaded.
 	 * @throws NoCashAvailableException If no cash is available for dispensing
 	 *                                  change.
-	 * @throws OutOfInkException
-	 * @throws OutOfPaperException
 	 * @throws OverloadedDevice
 	 * @throws EmptyDevice
 	 */
@@ -491,7 +479,7 @@ public class PaymentHandler {
 				System.out.println("The transaction failed. Please try again.");
 				return -1;
 			}
-			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			order.removeTotalPrice((long) amountCharged); // Update the total amount due to the customer
 			amountSpent = BigDecimal.valueOf(amountCharged);
 			changeRemaining = BigDecimal.ZERO;
 			// Receipt printing is handled inside the demo
@@ -543,7 +531,7 @@ public class PaymentHandler {
 				System.out.println("The transaction failed. Please try again.");
 				return -1;
 			}
-			totalCost = BigDecimal.ZERO; // Update the total amount due to the customer
+			order.removeTotalPrice((long) amountCharged); // Update the total amount due to the customer
 			amountSpent = BigDecimal.valueOf(amountCharged);
 			changeRemaining = BigDecimal.ZERO;
 			return 1;

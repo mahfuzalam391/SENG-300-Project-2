@@ -168,7 +168,6 @@ public class DemoIterationTwo {
             // Make an arraylist for the coins added
             ArrayList<Coin> coinsList = new ArrayList<>();
 
-            double price = 0;
 
             BarcodedItem barcodedItem;
             Mass mass;
@@ -218,7 +217,6 @@ public class DemoIterationTwo {
                         mass = new Mass(productWeight);
                         barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
                         scale.addAnItem(barcodedItem);
-                        price += 5;
                         break;
                     case "2":
                         order.addItemViaBarcodeScan(barcodeOfBanana);
@@ -227,7 +225,6 @@ public class DemoIterationTwo {
                         mass = new Mass(productWeight);
                         barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
                         scale.addAnItem(barcodedItem);
-                        price += 3;
                         break;
                     default:
                         System.out.println("Unable to process input. Please try again.");	// again prompts for adding a produce to the order cart
