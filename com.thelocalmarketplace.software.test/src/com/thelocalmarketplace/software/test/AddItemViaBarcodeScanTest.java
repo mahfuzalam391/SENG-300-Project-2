@@ -115,6 +115,9 @@ public class AddItemViaBarcodeScanTest {
 
 	@Test
 	public void testProductLookupInDatabaseWhenNull() {
+		
+		//Checks to see if the barcode is found in the databse, using a fake barcode
+		// Therefore, checks if its null
 		Numeral[] nonExistentBarcodeDigits = {Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven};
 		Barcode nonExistentBarcode = new Barcode(nonExistentBarcodeDigits);
 		BarcodedProduct nullProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(nonExistentBarcode);
@@ -126,10 +129,12 @@ public class AddItemViaBarcodeScanTest {
 	@Test
 	public void testUpdatesTheOrderTotalForPrice(){
 		testOrder.addTotalPrice(barcodedProduct.getPrice());
+		//Checks to see if the prices line up
 		assertEquals("Order total price should be updated", barcodedProduct.getPrice(),testOrder.getTotalPrice());
 
 	}
 
+	
 	@Test
 	public void testUpdatesTheOrderTotalForWeight() {
 		double before = testOrder.getTotalWeightInGrams();
@@ -137,6 +142,7 @@ public class AddItemViaBarcodeScanTest {
 		testOrder.addTotalWeightInGrams(productWeight);
 
 		double after = testOrder.getTotalWeightInGrams();
+		//This test checks to see if the total weight matches with the current wei
 		assertEquals("Order total for weight should be updated", after, before + productWeight, 0.01);
 	}
 	@Test
@@ -160,22 +166,25 @@ public class AddItemViaBarcodeScanTest {
 	@Test
 	public void testABarcodeHasBeenScannedWhenNoSession() {
 		SelfCheckoutStationSoftware.setStationActive(false);
-		
 		scanner.scan(barcodedItem);
 
 		// Item should NOT be added to the order
 		ArrayList<Item> order = testOrder.getOrder();
+		//Checks to see if the order is empty
 		assertTrue(order.isEmpty());
 	}
 	
 	@Test
 	public void testProductAddNullBarcodeToOrder() {
+		//Creates a fake barcode 
 		Numeral[] nonExistentBarcodeDigits = {Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven};
 		Barcode nonExistentBarcode = new Barcode(nonExistentBarcodeDigits);
 		Mass fakeMass = new Mass(1000000000); 
 		barcodedItem = new BarcodedItem(nonExistentBarcode, fakeMass);
+		// Scans the fake barcode, that should not be linked to a product
 		scanner.scan(barcodedItem);
 
+		//Checks to see if the barcode does indeed not add a product to the order
 		ArrayList<Item> order = testOrder.getOrder();
 		assertTrue(order.isEmpty());
 
@@ -193,6 +202,7 @@ public class AddItemViaBarcodeScanTest {
 	@Test
 	public void testGetOrderWhenEmpty() {
 		ArrayList<Item> order = testOrder.getOrder();
+		//Simple check to make sure order is empty
 		assertTrue(order.isEmpty());
 	}
 
