@@ -121,6 +121,12 @@ public class DemoIterationTwo {
         station.banknoteStorage.activate();
         station.banknoteValidator.activate();
         station.banknoteInput.activate();
+
+        // activate scale
+        scale.plugIn(PowerGrid.instance());
+        scale.turnOn();
+        scale.enable();
+
         for (Map.Entry<BigDecimal, ICoinDispenser> entry : station.coinDispensers.entrySet()) {
             entry.getValue().activate();
         }
@@ -160,29 +166,41 @@ public class DemoIterationTwo {
 
             double price = 0;
 
+            label:
             while (true) {
                 // User interaction
-                System.out.println("Enter '1' for Apple.");
-                System.out.println("Enter '2' for Banana.");
+                System.out.println("Enter '0' to finish with your order.");
+                System.out.println("Enter '1' to scan Apple.");
+                System.out.println("Enter '2' to scan Banana.");
                 itemInput = input.nextLine();
 
                 // The user chooses what item they want and the item is added to the order.
                 // The price of the item is recorded
-                if (itemInput.equals("1")) {
-                    order.addItemViaBarcodeScan(barcodeOfApple);
-                    System.out.println("The price of an apple is $5. You must pay $5 total.");
-                    price = 5;
-                    break;
-                } else if (itemInput.equals("2")) {
-                    order.addItemViaBarcodeScan(barcodeOfBanana);
-                    System.out.println("The price of a banana is $3. You must pay $3 total.");
-                    price = 3;
-                    break;
-                } else {
-                    System.out.println("Unable to process input. Please try again.");
+                switch (itemInput) {
+                    case "0":
+                        break label; // get out of the loop if the user is done with order else they can keep adding stuff
+                    case "1":
+                        order.addItemViaBarcodeScan(barcodeOfApple);
+                        price += 5;
+                        break;
+                    case "2":
+                        order.addItemViaBarcodeScan(barcodeOfBanana);
+                        price += 3;
+                        break;
+                    default:
+                        System.out.println("Unable to process input. Please try again.");
+                        break;
                 }
+
+                order.displayOrder();
             }
 
+            System.out.println("Would you like to remove any items from your order? (Yes/No)");
+            String removeAny = input.nextLine();
+
+            if(removeAny.equalsIgnoreCase("Yes")) {
+                order.signalToRemoveItemFromOrder(input);
+            }
             PaymentHandler paymentHandler = new PaymentHandler(station, order);
             boolean breakWhileLoop = true;
 
@@ -202,65 +220,45 @@ public class DemoIterationTwo {
 
                     // Handles payment with credit card
                     case 1:
-                        System.out.println("You pay $" + price + " with your credit card.");
-                        if (paymentHandler.payWithCreditViaSwipe(creditCard, price, cardIssuer) == -1) {
+                        System.out.println("You pay $" + order.getTotalPrice() + " with your credit card.");
+                        if (paymentHandler.payWithCreditViaSwipe(creditCard, order.getTotalPrice(), cardIssuer) == -1) {
                             System.out.println("Unsuccessful Payment! Please try again.");
                             break;
                         }
-                        price = paymentHandler.getTotalCost().doubleValue();
-                        System.out.println("Successful Payment! The total price is now $" + price + ".");
+                        System.out.println("Successful Payment! The total price is now $" + order.getTotalPrice() + ".");
 
                         breakWhileLoop = false;
                         break;
 
                     // Handles payment with debit card
                     case 2:
-                        System.out.println("You pay $" + price + " with your debit card.");
-                        if (paymentHandler.payWithDebitViaSwipe(debitCard, price, cardIssuer) == -1) {
+                        System.out.println("You pay $" + order.getTotalPrice() + " with your debit card.");
+                        if (paymentHandler.payWithDebitViaSwipe(debitCard, order.getTotalPrice(), cardIssuer) == -1) {
                             System.out.println("Unsuccessful Payment! Please try again.");
                             break;
                         }
-                        
-                        price = paymentHandler.getTotalCost().doubleValue();
-                        System.out.println("Successful Payment! The total price is now $" + price + ".");
+
+                        System.out.println("Successful Payment! The total price is now $" + order.getTotalPrice() + ".");
 
                         breakWhileLoop = false;
                         break;
 
                     // Handles payment with coin
                     case 3:
-                        if (price == 5) {
-                            System.out.println("You insert 5 $1 coins.");
+                        System.out.println("You have selected to pay with coins.");
+                        System.out.println("You insert " + order.getTotalPrice() + " $1 coins.");
 
-                            // Add 5 1 dollar coins to the coinsList
-                            for (int i = 0; i < 5; i++) {
-                                Coin coin = new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(1));
-                                coinsList.add(coin);
-                            }
+                        // Add 1 dollar coins to the coinsList
+                        for (int i = 0; i < (int) order.getTotalPrice(); i++) {
+                            Coin coin = new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(1));
+                            coinsList.add(coin);
+                        }
 
-                            if (paymentHandler.processPaymentWithCoins(coinsList)) {
-                                System.out.println("Payment Successful!");
-                            } else {
-                                System.out.println("Unsuccessful Payment! Please try again.");
-                                break;
-                            }
-
+                        if (paymentHandler.processPaymentWithCoins(coinsList)) {
+                            System.out.println("Payment Successful!");
                         } else {
-                            System.out.println("You insert 3 $1 coins.");
-
-                            // Add 3 1 dollar coins to the coinsList
-                            for (int i = 0; i < 3; i++) {
-                                Coin coin = new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(1));
-                                coinsList.add(coin);
-                            }
-
-                            // Test processPaymentWithCoins function, if successful print out a receipt.
-                            if (paymentHandler.processPaymentWithCoins(coinsList)) {
-                                System.out.println("Payment Successful!");
-                            } else {
-                                System.out.println("Unsuccessful Payment! Please try again.");
-                                break;
-                            }
+                            System.out.println("Unsuccessful Payment! Please try again.");
+                            break;
                         }
 
                         breakWhileLoop = false;
@@ -269,29 +267,15 @@ public class DemoIterationTwo {
                     // Handles payment with banknotes
                     case 4:
                         System.out.println("You have selected to pay with banknote.");
-
-                        if (price == 5) {
-                            System.out.println("You insert a $5 bill.");
-                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(5));
-                            ArrayList<Banknote> banknotes = new ArrayList<>();
-                            banknotes.add(banknote);
-                            if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
-                                System.out.println("Payment Successful!");
-                            } else {
-                                System.out.println("Unsuccessful Payment! Please try again.");
-                                break;
-                            }
+                        System.out.println("You insert a $" + order.getTotalPrice() + " dollar bill.");
+                        Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(5));
+                        ArrayList<Banknote> banknotes = new ArrayList<>();
+                        banknotes.add(banknote);
+                        if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
+                            System.out.println("Payment Successful!");
                         } else {
-                            System.out.println("You insert a $3 bill.");
-                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(3));
-                            ArrayList<Banknote> banknotes = new ArrayList<>();
-                            banknotes.add(banknote);
-                            if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
-                                System.out.println("Payment Succesful!");
-                            } else {
-                                System.out.println("Unsuccessful Payment! Please try again.");
-                                break;
-                            }
+                            System.out.println("Unsuccessful Payment! Please try again.");
+                            break;
                         }
                         breakWhileLoop = false;
                         break;
