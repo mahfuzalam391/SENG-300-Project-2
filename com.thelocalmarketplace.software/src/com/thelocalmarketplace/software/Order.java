@@ -204,6 +204,8 @@ public class Order {
 		// 3. Orange
 		// removing "1" will remove banana from the order
 
+		BarcodedItem itemRemoved = (BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1);
+
 		// check if there is an active session
 		if (SelfCheckoutStationSoftware.getStationActive()) {
 			// check if the station is not blocked
@@ -213,7 +215,7 @@ public class Order {
 
 				Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
 				// remove the item from the order
-				removeItemFromOrder((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1));
+				removeItemFromOrder(itemRemoved);
 
 				BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
@@ -227,7 +229,7 @@ public class Order {
 		// check for weight discrepancy, then unlock the station
 		checkForDiscrepancy();
 
-		return (BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1);
+		return itemRemoved;
 	}
 	 
 
