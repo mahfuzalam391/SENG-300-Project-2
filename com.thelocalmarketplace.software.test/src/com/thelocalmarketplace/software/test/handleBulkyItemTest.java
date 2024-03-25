@@ -86,6 +86,11 @@ public class handleBulkyItemTest {
         assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
   	}
    	
+   	/*
+     * Create a test to ensure that the system handles if the weight of the bulky item is 0 (by error)
+     *  
+     */
+   	
    	@Test
    	public void zeroWeightBulkyItem() throws OverloadedDevice{
    		Order order = new Order(scale);
@@ -96,6 +101,24 @@ public class handleBulkyItemTest {
         WeightDiscrepancy.handleBulkyItem(order, 0);
         double expectedTotalWeight = 10;
         assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   	}
+   	
+   	/*
+     * Create a test to ensure that the system handles it when the bulky item is the first item added 
+     * 
+     * The system should not crash and it should correctly adjust the weight 
+     *  
+     */
+   	
+   	@Test
+   	public void emptyOrderBulkyItem() throws OverloadedDevice{
+   		Order order = new Order(scale);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 79);
+   		
+   		double expectedTotalWeight = 0;
+        assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   		
    	}
    	
 }
