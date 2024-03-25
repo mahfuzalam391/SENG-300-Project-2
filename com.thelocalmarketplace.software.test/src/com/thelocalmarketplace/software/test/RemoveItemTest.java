@@ -2,6 +2,7 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.*;
 
+import com.jjjwelectronics.Item;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,10 @@ import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
 
 import powerutility.PowerGrid;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class RemoveItemTest {
 	PowerGrid grid;
@@ -120,6 +125,8 @@ public class RemoveItemTest {
 		orderSilver.addTotalWeightInGrams(productWeightInGrams);
 		orderSilver.addTotalPrice(productPrice);
 		scaleSilver.addAnItem(barcodedItem);
+
+		Scanner input = new Scanner(System.in);
 	}
 
 	// test that the weight in the order changed after the item is removed from order
@@ -228,12 +235,30 @@ public class RemoveItemTest {
 		// removeItemFromOrder should return false since the order is empty
 		assertFalse(orderSilver.removeItemFromOrder(barcodedItem));
 	}
+
+	@Test
+	public void testSignalToRemoveItemFromOrderBronze() throws OverloadedDevice {
+		ArrayList<Item> orderBeforeRemoval = orderBronze.getOrder(); // get the order list before removal
+
+		int lengthBefore = orderBeforeRemoval.size(); // get the length of the order list before removal
+
+		String inputData = "1"; // remove the first item in the order
+		System.setIn(new java.io.ByteArrayInputStream(inputData.getBytes()));
+		Scanner testInput = new Scanner(System.in);
+		orderBronze.signalToRemoveItemFromOrder(testInput); // remove the item from the order
+
+		ArrayList<Item> orderAfterRemoval = orderBronze.getOrder();
+		int lengthAfter = orderAfterRemoval.size();
+
+		assertEquals(lengthAfter, lengthBefore - 1);
+	}
+
 	@Test
     	public void testRemovingItemWithNullProductInDatabaseGold() {
 	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
         	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
         	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
-        	orderGold.addItemToOrder(itemWithNullProduct); 
+        	orderGold.addItemToOrder(itemWithNullProduct);
         	assertTrue("The item should be removed even if the product is null in the database", orderGold.removeItemFromOrder(itemWithNullProduct));
     	}
 	@Test
@@ -241,7 +266,7 @@ public class RemoveItemTest {
 	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
         	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
         	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
-        	orderSilver.addItemToOrder(itemWithNullProduct); 
+        	orderSilver.addItemToOrder(itemWithNullProduct);
         	assertTrue("The item should be removed even if the product is null in the database", orderSilver.removeItemFromOrder(itemWithNullProduct));
     	}
 	@Test
@@ -249,10 +274,10 @@ public class RemoveItemTest {
 	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
         	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
         	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
-        	orderBronze.addItemToOrder(itemWithNullProduct); 
+        	orderBronze.addItemToOrder(itemWithNullProduct);
         	assertTrue("The item should be removed even if the product is null in the database", orderBronze.removeItemFromOrder(itemWithNullProduct));
     	}
-	
+
 	@Test
    	 public void testRemovingLastItemGold() {
         	orderGold.removeItemFromOrder(barcodedItem); // Remove the initial item first
@@ -271,7 +296,7 @@ public class RemoveItemTest {
         	orderBronze.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
         	assertTrue("The last item should be removed successfully", orderBronze.removeItemFromOrder(barcodedItem));
 	}
-	
+
 	@After
 	public void tearDown() {
 		// deregister BaggingAreaListeners

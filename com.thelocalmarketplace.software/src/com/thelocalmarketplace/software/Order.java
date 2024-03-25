@@ -187,15 +187,19 @@ public class Order {
 	 * Signals that a specific item is to be removed from the order
 	 * @throws OverloadedDevice 
 	 */
-	public void signalToRemoveItemFromOrder() throws OverloadedDevice {
+	public void signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
 		System.out.println("Please select the item you want to remove from the order.");
 
 		displayOrder(); // Displays the order to the customer
 
-		Scanner scanner = new Scanner(System.in);
-		String itemToRemove = scanner.nextLine();
+		String itemToRemove = scanner.nextLine(); // this will be the order number of the item to remove
 
+		// example:
+		// 1. Banana
+		// 2. Apple
+		// 3. Orange
+		// removing "1" will remove banana from the order
 
 		// check if there is an active session
 		if (SelfCheckoutStationSoftware.getStationActive()) {
@@ -204,10 +208,10 @@ public class Order {
 				// blocks station from further  customer actions
 				SelfCheckoutStationSoftware.setStationBlock(true);
 
+				Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
 				// remove the item from the order
 				removeItemFromOrder((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1));
 
-				Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
 				BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
 				// Signals to the customer that the item has been removed from the order
@@ -221,15 +225,19 @@ public class Order {
 		checkForDiscrepancy();
 	}
 
+	/**
+	 * Display the order to the customer
+	 */
 	public void displayOrder(){
+		System.out.println("\nOrder details:\n");
 		// list the items in order
 		for (int i = 1; i <= order.size(); i++) {
-			Barcode barcode = ((BarcodedItem) order.get(i)).getBarcode();
+			Barcode barcode = ((BarcodedItem) order.get(i - 1)).getBarcode();
 
 			BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
-			System.out.println(i + ". " + "(What is this " + order.get(i).toString() + ") " + product.getDescription() + " " + product.getPrice() + " " + product.getExpectedWeight());
+			System.out.println(i + ". " + product.getDescription() + "\nPrice of product: $" + product.getPrice() + "\nWeight of product: " + product.getExpectedWeight());
 		}
-		System.out.println("Total price: " + getTotalPrice() + " Total weight: " + getTotalWeightInGrams());
+		System.out.println("\nTotal price: " + getTotalPrice() + "\nTotal weight: " + getTotalWeightInGrams() + " \n");
 	}
 
 }
