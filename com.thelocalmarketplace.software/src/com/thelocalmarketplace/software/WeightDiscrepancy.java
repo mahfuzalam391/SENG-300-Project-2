@@ -190,8 +190,10 @@ public class WeightDiscrepancy {
 		System.out.println("No-bagging request is in progress.");
 		// add code here when attendant feedback can be handled (?) 
 		System.out.println("Request has been approved");
-		double finalWeight = -productWeight;
-		order.addTotalWeightInGrams(finalWeight);
+		double currentWeight = order.getTotalWeightInGrams();
+		double finalWeight = currentWeight-productWeight;
+		if (finalWeight < 0) order.addTotalWeightInGrams(0);
+		else order.addTotalWeightInGrams(finalWeight);
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
 }

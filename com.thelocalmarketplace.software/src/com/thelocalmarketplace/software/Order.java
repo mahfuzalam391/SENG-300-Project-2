@@ -143,18 +143,24 @@ public class Order {
 
 	/**
 	 * Adds an item to the order via barcode scan
+	 * Accounting for Bronze, Silver and Gold checkout Stations
 	 */
 	public void addItemViaBarcodeScan(Barcode barcode) {
-		// Get the product from the database
+		// Gets the product from the hardware's database
+		// All the barcodes are accepted from the bronze, silver and gold
 		BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
-		//To make sure the barcode scanned is available in the database
+		//Makes sure that the product that is recieved from the barcode 
+		// Is not null, therefore making sure it exists.
 		if (product != null) {
-			double productWeight = product.getExpectedWeight(); // Gets products weight from barcode
+			//Gets both the products price and weight
+			double productWeight = product.getExpectedWeight(); 
 			long productPrice = product.getPrice();
 
-			addTotalWeightInGrams(productWeight); // Adds the weight of the product to the total weight of the order
-			addTotalPrice(productPrice); // Adds the price of the product to the total price of the order
+			// Adds the weight and price of the product 
+			// Adding it to the total weight/price
+			addTotalWeightInGrams(productWeight); 
+			addTotalPrice(productPrice); 
 
 			mass = new Mass(productWeight); // Converts the weight of the product to a mass
 			barcodedItem = new BarcodedItem(barcode, mass); // Adds the product to the order
@@ -180,16 +186,21 @@ public class Order {
 
 	/**
 	 * Signals that a specific item is to be removed from the order
+	 * @throws OverloadedDevice 
 	 */
-	public void signalToRemoveItemFromOrder() {
+	public void signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
-		System.out.println("Please select the item you want to remove from the order.");
+		System.out.println("Please select the item you want to remove from the order as a number from the order list.");
 
 		displayOrder(); // Displays the order to the customer
 
-		Scanner scanner = new Scanner(System.in);
-		String itemToRemove = scanner.nextLine();
+		String itemToRemove = scanner.nextLine(); // this will be the order number of the item to remove
 
+		// example:
+		// 1. Banana
+		// 2. Apple
+		// 3. Orange
+		// removing "1" will remove banana from the order
 
 		// check if there is an active session
 		if (SelfCheckoutStationSoftware.getStationActive()) {
@@ -198,10 +209,10 @@ public class Order {
 				// blocks station from further  customer actions
 				SelfCheckoutStationSoftware.setStationBlock(true);
 
-				// remove the item from the order
-				removeItemFromOrder(order.get(Integer.parseInt(itemToRemove) - 1));
-
 				Barcode barcode = ((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1)).getBarcode();
+				// remove the item from the order
+				removeItemFromOrder((BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1));
+
 				BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
 				// Signals to the customer that the item has been removed from the order
@@ -210,17 +221,24 @@ public class Order {
 				displayOrder(); // Displays the order to the customer after removal
 			}
 		}
+		
+		// check for weight discrepancy, then unlock the station
+		checkForDiscrepancy();
 	}
 
+	/**
+	 * Display the order to the customer one by one from the list of items in the order
+	 */
 	public void displayOrder(){
+		System.out.println("\nOrder details:\n");
 		// list the items in order
 		for (int i = 1; i <= order.size(); i++) {
-			Barcode barcode = ((BarcodedItem) order.get(i)).getBarcode();
+			Barcode barcode = ((BarcodedItem) order.get(i - 1)).getBarcode();
 
 			BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
-			System.out.println(i + ". " + "(What is this " + order.get(i).toString() + ") " + product.getDescription() + " " + product.getPrice() + " " + product.getExpectedWeight());
+			System.out.println(i + ". " + product.getDescription() + "\nPrice of product: $" + product.getPrice() + "\nWeight of product: " + product.getExpectedWeight());
 		}
-		System.out.println("Total price: " + getTotalPrice() + " Total weight: " + getTotalWeightInGrams());
+		System.out.println("\nTotal price: " + getTotalPrice() + "\nTotal weight: " + getTotalWeightInGrams() + " \n");
 	}
 
 }

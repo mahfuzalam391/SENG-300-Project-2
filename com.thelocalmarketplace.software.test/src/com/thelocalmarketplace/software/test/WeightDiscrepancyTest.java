@@ -38,7 +38,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
-import com.jjjwelectronics.scale.ElectronicScale;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.thelocalmarketplace.software.Order;
 import com.thelocalmarketplace.software.SelfCheckoutStationSoftware;
 import com.thelocalmarketplace.software.WeightDiscrepancy;
@@ -50,7 +50,7 @@ import powerutility.PowerGrid;
 public class WeightDiscrepancyTest {            
 	
 	private WeightDiscrepancy weightDiscrepancy;
-	private Order order;
+	private Order order; 
 	private mockScale scale;
 	private Order order4;
 	private mockScale  scale4;

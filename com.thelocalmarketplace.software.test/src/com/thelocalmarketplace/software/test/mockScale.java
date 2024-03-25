@@ -34,7 +34,7 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
-import com.jjjwelectronics.scale.ElectronicScale;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
@@ -45,6 +45,7 @@ import powerutility.PowerGrid;
 public class mockScale extends AbstractElectronicScale {
 	protected mockScale(Mass limit, Mass sensitivityLimit) {
 		super(limit, sensitivityLimit);
+		this.massLimit = limit;  
 		// TODO Auto-generated constructor stub
 	}
 
