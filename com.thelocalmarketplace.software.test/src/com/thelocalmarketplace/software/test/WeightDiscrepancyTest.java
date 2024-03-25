@@ -75,15 +75,24 @@ public class WeightDiscrepancyTest {
 	@Before
 	public void setUp() throws OverloadedDevice {   
 		
-		 		
+		 	// Create a mock scale with new mass and sensitivity limits	
 	        scale = new mockScale(new Mass(40000000),new Mass(40000000));  
+	        
+	        // Make a power grid for hardware to connect to
 	        PowerGrid grid = PowerGrid.instance();
+	        
+	        // Power and enable hardware objects
 	        scale.plugIn(grid);
 	        scale.turnOn();
 	        scale.enable();
+	        
+	        // Initializing order
 	        order = new Order(scale);
+	        
+	        // Initializing weightDiscrepancy
 	        weightDiscrepancy = new WeightDiscrepancy(order, scale);  
 	        
+	        // Power and enable the list of bronze/silver/gold scales
 	        grid = PowerGrid.instance();
 	        eScale.plugIn(grid);
 	        eScale.turnOn();
@@ -92,7 +101,8 @@ public class WeightDiscrepancyTest {
     }
 	
 	  	
-	/** Create MockItem class that extends Item class, will be used when need to make an item to add to order/scale etc */
+	// Create MockItem class that extends Item class, 
+	// Used when needing to make an item to add to order/scale etc
     class MockItem extends Item {
         public MockItem(Mass mass) {
             super(mass);
@@ -108,13 +118,20 @@ public class WeightDiscrepancyTest {
     @Test
     public void testUpdateMass_AddItemToOrder() throws OverloadedDevice {
          
+    	// Create items with defined mass & add to order
     	MockItem item1 = new MockItem(new Mass(100));
     	MockItem item2 = new MockItem(new Mass(100));      
         order.addItemToOrder(item1);
         order.addItemToOrder(item2);
-        WeightDiscrepancy weightDiscrepancy2 = new WeightDiscrepancy(order,scale);  
-        weightDiscrepancy2.updateMass();
+        
+        
+       // WeightDiscrepancy weightDiscrepancy2 = new WeightDiscrepancy(order,scale);  
+        weightDiscrepancy.updateMass();
+        
+        // Expected mass should be sum of item 1 and item 2
         Mass expectedMass = new Mass(200);
+        
+        // Check to see if expected mass equals the mass on the scale
         assertEquals(expectedMass, scale.getCurrentMassOnTheScale());       
     } 
     
@@ -144,7 +161,7 @@ public class WeightDiscrepancyTest {
          order5.addTotalWeightInGrams(2);  
        
          weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);  
-         weightDiscrepancy.checkDiscrepancy();
+         weightDiscrepancy4.checkDiscrepancy();
         
          assertTrue(SelfCheckoutStationSoftware.getStationBlock());     
         
@@ -537,10 +554,45 @@ public class WeightDiscrepancyTest {
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
    	}
    	
+   	@Test
+   	public void testHandleSameBulkyItem() throws OverloadedDevice {
+   		Order order = new Order(eScale);
+   		MockItem item1 = new MockItem(new Mass(10));
+   		MockItem bulkyItem1 = new MockItem(new Mass(60));
+   		
+   		order.addItemToOrder(item1);
+   		order.addTotalWeightInGrams(10);
+   		
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(60);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 60);
+   		
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(60);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 60);
+   		
+   		double expectedTotalWeight = 10;
+   		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   	}
    	
-   	
-   	
-    
-   	
+   	@Test
+   	public void testHandleBulkyItem_removeWrongWeight() throws OverloadedDevice {
+   		Order order = new Order(eScale);
+   		MockItem item1 = new MockItem(new Mass(10));
+   		MockItem bulkyItem1 = new MockItem(new Mass(60));
+   		
+   		order.addItemToOrder(item1);
+   		order.addTotalWeightInGrams(10);
+   		
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(60);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 70);
+   		
+   		weightDiscrepancy.checkIfCanUnblock();
+        assertFalse(SelfCheckoutStationSoftware.getStationBlock()); 
+   	}
    	
 }
