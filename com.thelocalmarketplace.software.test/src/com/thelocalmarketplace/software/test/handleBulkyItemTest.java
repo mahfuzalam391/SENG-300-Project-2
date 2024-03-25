@@ -6,19 +6,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collection;
+
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
-import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scale.ElectronicScaleGold;
 import com.jjjwelectronics.scale.ElectronicScaleSilver;
@@ -91,6 +87,4 @@ public class handleBulkyItemTest {
         double expectedTotalWeight = 10;
         assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
   	}
-   	
-	
 }
