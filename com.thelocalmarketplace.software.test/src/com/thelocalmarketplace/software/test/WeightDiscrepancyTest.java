@@ -536,7 +536,7 @@ public class WeightDiscrepancyTest {
    		MockItem item1 = new MockItem(new Mass(10));
    		order.addItemToOrder(item1);
         order.addTotalWeightInGrams(10);
-        
+
         WeightDiscrepancy.handleBulkyItem(order, 0);
         double expectedTotalWeight = 10;
         assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
@@ -552,6 +552,10 @@ public class WeightDiscrepancyTest {
    	@Test
    	public void emptyOrderBulkyItem() throws OverloadedDevice{
    		Order order = new Order(eScale);
+   		
+   		MockItem bulkyItem1 = new MockItem(new Mass(79));
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(79);
    		
    		WeightDiscrepancy.handleBulkyItem(order, 79);
    		
