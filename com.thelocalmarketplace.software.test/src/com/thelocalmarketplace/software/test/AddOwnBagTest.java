@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.math.BigDecimal;
 
@@ -55,11 +56,7 @@ public class AddOwnBagTest {
 	
 
 	
-	
-	/**
-	 * Initializing order, addOwnBag and scale for test set up. 
-	 * @throws OverloadedDevice
-	 */
+
 	
 	@Before
 	public void setUp() throws OverloadedDevice { 
@@ -81,6 +78,7 @@ public class AddOwnBagTest {
 	
 	/**
 	 * Test for getBagWeight when a bag has been added to the scale. Creating a scale heavier than the order value 
+	 * calling getBagWeight, using order mass and new mockscale mass created. 
 	 * expected weight = bag weight, calculated from the scale and order weight difference
 	 * @throws OverloadedDevice
 	 */
@@ -101,6 +99,7 @@ public class AddOwnBagTest {
 	/**
 	 * Testing getBagWeight when no bag has been added. The scale and order are the same weight because no bag
 	 * has been added to the scale. 
+	 * calling getBagWeight, using order mass and created new mockscale mass. 
 	 * Expected bag weight is 0.0 
 	 * @throws OverloadedDevice
 	 */
@@ -119,7 +118,7 @@ public class AddOwnBagTest {
 	
 	/**
 	 * Testing addbagweight() when a bag is added to the scale when its over the threshold weight. 
-	 * Creating new mockScale, adding an item to push scale over mass limit and a new bag. 
+	 * Creating new mockScale, adding an item to push scale over mass limit and a new bag. Calling addbagweight. 
 	 * expected to block system. 
 	 * @throws OverloadedDevice
 	 */
@@ -135,7 +134,7 @@ public class AddOwnBagTest {
 	
 	/**
 	 * Testing addbagweight() when a under bag is added to the scale under the threshold weight. 
-	 * Creating new mockScale, adding an item that remains under mass limit, and adding a new bag where scale weight 
+	 * Creating new mockScale, adding an item that remains under mass limit, and adding a new bag where scale weight. Calling addbagweight. 
 	 * will still remain under limit. 
 	 * system expected to remain unblocked. 
 	 * @throws OverloadedDevice
@@ -150,6 +149,28 @@ public class AddOwnBagTest {
 		//when the items are within the scale mass limit the system should not be blocked
 		assertFalse(SelfCheckoutStationSoftware.getStationBlock()); 
 	}
+	
+	@Test 
+	public void testtheMassOnTheScaleHasChanged_MassChange() {
+		mockScale scaleChange = new mockScale(new Mass(40000000), new Mass(40000000));
+		AddOwnBag addOwnBag = new AddOwnBag(order, scaleChange);
+		Mass addMass = new Mass(BigDecimal.valueOf(50000000)); 
+		//addOwnBag.theMassOnTheScaleHasChanged(scaleChange, addMass); 
+	}
+	
+	
+	/**
+	 * testing print_mess. creating addOwnBag and calling print_mess. 
+	 * Expected that printed output equals "You may now continue". 
+	 */
+	@Test
+    public void testPrintMess() {
+		ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+	    System.setOut(new PrintStream(outputStreamCaptor));
+        addOwnBag.print_mess();
+        Assert.assertEquals("You may now continue", outputStreamCaptor.toString().trim()); 
+        //https://stackoverflow.com/questions/1119385/junit-test-for-system-out-println
+    }
 }
 
 

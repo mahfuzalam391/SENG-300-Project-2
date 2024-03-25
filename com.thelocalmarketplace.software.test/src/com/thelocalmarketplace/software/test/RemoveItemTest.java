@@ -253,6 +253,50 @@ public class RemoveItemTest {
 		assertEquals(lengthAfter, lengthBefore - 1);
 	}
 
+	@Test
+    	public void testRemovingItemWithNullProductInDatabaseGold() {
+	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
+        	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
+        	orderGold.addItemToOrder(itemWithNullProduct);
+        	assertTrue("The item should be removed even if the product is null in the database", orderGold.removeItemFromOrder(itemWithNullProduct));
+    	}
+	@Test
+    	public void testRemovingItemWithNullProductInDatabaseSilver() {
+	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
+        	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
+        	orderSilver.addItemToOrder(itemWithNullProduct);
+        	assertTrue("The item should be removed even if the product is null in the database", orderSilver.removeItemFromOrder(itemWithNullProduct));
+    	}
+	@Test
+    	public void testRemovingItemWithNullProductInDatabaseBronze() {
+	 	Mass itemMass = new Mass(1000000000); // 1kg in micrograms
+        	Barcode nullProductBarcode = new Barcode(new Numeral[]{Numeral.six, Numeral.seven, Numeral.eight, Numeral.nine, Numeral.zero});
+        	BarcodedItem itemWithNullProduct = new BarcodedItem(nullProductBarcode, itemMass);
+        	orderBronze.addItemToOrder(itemWithNullProduct);
+        	assertTrue("The item should be removed even if the product is null in the database", orderBronze.removeItemFromOrder(itemWithNullProduct));
+    	}
+
+	@Test
+   	 public void testRemovingLastItemGold() {
+        	orderGold.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderGold.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderGold.removeItemFromOrder(barcodedItem));
+	}
+	@Test
+    	public void testRemovingLastItemSilver() {
+        	orderSilver.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderSilver.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderSilver.removeItemFromOrder(barcodedItem));
+	}
+	@Test
+    	public void testRemovingLastItemBronze() {
+        	orderBronze.removeItemFromOrder(barcodedItem); // Remove the initial item first
+        	orderBronze.addItemToOrder(barcodedItem); // Add it back to have only one item in the order
+        	assertTrue("The last item should be removed successfully", orderBronze.removeItemFromOrder(barcodedItem));
+	}
+
 	@After
 	public void tearDown() {
 		// deregister BaggingAreaListeners

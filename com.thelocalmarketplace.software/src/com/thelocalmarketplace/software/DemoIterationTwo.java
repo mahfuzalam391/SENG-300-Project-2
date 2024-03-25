@@ -63,6 +63,7 @@ public class DemoIterationTwo {
         // Represents user input
         Scanner input = new Scanner(System.in);
 
+        // Initialize station, scale, and denominations
         AbstractSelfCheckoutStation station = null;
         AbstractElectronicScale scale = null;
         BigDecimal[] denominations = {BigDecimal.valueOf(3), BigDecimal.valueOf(5), BigDecimal.valueOf(1)};
@@ -76,17 +77,18 @@ public class DemoIterationTwo {
         AbstractSelfCheckoutStation.configureCoinTrayCapacity(10);
         AbstractSelfCheckoutStation.configureCoinDispenserCapacity(10);
 
+        // Create all fields related to bank and card
         CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
-
         Card creditCard = new Card("Credit", "21", "Holder1", "211");
         Card debitCard = new Card("Debit", "12", "Holder2", "122");
-
         Calendar expiry = Calendar.getInstance();
         expiry.add(Calendar.YEAR, 5);
 
+        // Add each card's data into the cardIssuer
         cardIssuer.addCardData("21", "Holder1", expiry, "211", 2000);
         cardIssuer.addCardData("12", "Holder2", expiry, "122", 2000);
 
+        // User input for which self-checkout station user wants.
         System.out.println("Enter '1' for gold system.");
         System.out.println("Enter '2' for silver system.");
         System.out.println("Enter '3' for bronze system.");
@@ -94,7 +96,7 @@ public class DemoIterationTwo {
         int stationType = input.nextInt();
         input.nextLine();
 
-        // Initialize the station and scale
+        // Initialize the station and scale based on user input
         switch (stationType) {
             case 1:
                 station = new SelfCheckoutStationGold();
@@ -110,6 +112,7 @@ public class DemoIterationTwo {
                 break;
         }
 
+        // Activate and get power to each necessary component of the self-checkout station
         PowerGrid.engageUninterruptiblePowerSource();
         station.plugIn(PowerGrid.instance());
         station.coinStorage.activate();
@@ -118,11 +121,9 @@ public class DemoIterationTwo {
         station.banknoteStorage.activate();
         station.banknoteValidator.activate();
         station.banknoteInput.activate();
-
         for (Map.Entry<BigDecimal, ICoinDispenser> entry : station.coinDispensers.entrySet()) {
             entry.getValue().activate();
         }
-
         for (Entry<BigDecimal, IBanknoteDispenser> entry : station.banknoteDispensers.entrySet()) {
             entry.getValue().activate();
         }
@@ -166,6 +167,7 @@ public class DemoIterationTwo {
                 itemInput = input.nextLine();
 
                 // The user chooses what item they want and the item is added to the order.
+                // The price of the item is recorded
                 if (itemInput.equals("1")) {
                     order.addItemViaBarcodeScan(barcodeOfApple);
                     System.out.println("The price of an apple is $5. You must pay $5 total.");
@@ -182,9 +184,9 @@ public class DemoIterationTwo {
             }
 
             PaymentHandler paymentHandler = new PaymentHandler(station, order);
-
             boolean breakWhileLoop = true;
 
+            // Handle all user input for payment options
             while (breakWhileLoop) {
                 System.out.println("Checkout completed. How would you like to pay?");
                 System.out.println("1. Credit Card");
@@ -197,6 +199,8 @@ public class DemoIterationTwo {
                 input.nextLine();
 
                 switch (paymentChoice) {
+
+                    // Handles payment with credit card
                     case 1:
                         System.out.println("You pay $" + price + " with your credit card.");
                         if (paymentHandler.payWithCreditViaSwipe(creditCard, price, cardIssuer) == -1) {
@@ -208,6 +212,8 @@ public class DemoIterationTwo {
 
                         breakWhileLoop = false;
                         break;
+
+                    // Handles payment with debit card
                     case 2:
                         System.out.println("You pay $" + price + " with your debit card.");
                         if (paymentHandler.payWithDebitViaSwipe(debitCard, price, cardIssuer) == -1) {
@@ -221,6 +227,7 @@ public class DemoIterationTwo {
                         breakWhileLoop = false;
                         break;
 
+                    // Handles payment with coin
                     case 3:
                         if (price == 5) {
                             System.out.println("You insert 5 $1 coins.");
@@ -258,6 +265,8 @@ public class DemoIterationTwo {
 
                         breakWhileLoop = false;
                         break;
+
+                    // Handles payment with banknotes
                     case 4:
                         System.out.println("You have selected to pay with banknote.");
 
@@ -287,11 +296,13 @@ public class DemoIterationTwo {
                         breakWhileLoop = false;
                         break;
 
+                        // Handles invalid input
                     default:
                         System.out.println("Invalid choice. Please enter a valid option.");
                 }
             } // End of payment while loop
 
+            // Handles receipt prompt and print
             System.out.println("Would you like a receipt? (Yes/No)");
             String receiptChoice = input.nextLine();
             
@@ -305,6 +316,8 @@ public class DemoIterationTwo {
             System.out.println("Failed to initialize order: " + e.getMessage());
             e.printStackTrace();
         } finally {
+
+            // Cleanup and close.
             if (input != null) {
                 input.close();
             }
