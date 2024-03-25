@@ -84,6 +84,7 @@ public class Order {
 				
 				removeTotalWeightInGrams(productWeight);
 				removeTotalPrice(productPrice);
+
 			}
 			return true;
 		}
@@ -168,15 +169,16 @@ public class Order {
 
 			// Signal to the customer to place the scanned item in the bagging area
 			System.out.println("Please place item in the bagging area.");
+
 		}
 	}
 
 	/**
 	 * Checks for weight discrepancy, is called by the baggingAreaListener after an item is added to the bagging area scale
+	 * and the signalToRemoveItemFromOrder after the item is removed from the order.
 	 * @throws OverloadedDevice
 	 */
 	public void checkForDiscrepancy() throws OverloadedDevice {
-		// This method is called by the baggingAreaListener after an item is added to the bagging area scale
 		WeightDiscrepancy weightDiscrepancy = new WeightDiscrepancy(this, scale);
 
 		weightDiscrepancy.checkIfCanUnblock(); // Checks for a weight discrepancy, if none, it unblocks the system
@@ -188,7 +190,7 @@ public class Order {
 	 * Signals that a specific item is to be removed from the order
 	 * @throws OverloadedDevice 
 	 */
-	public void signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
+	public BarcodedItem signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
 		System.out.println("Please select the item you want to remove from the order as a number from the order list.");
 
@@ -224,6 +226,8 @@ public class Order {
 		
 		// check for weight discrepancy, then unlock the station
 		checkForDiscrepancy();
+
+		return (BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1);
 	}
 
 	/**

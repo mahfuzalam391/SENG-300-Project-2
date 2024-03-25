@@ -163,11 +163,6 @@ public class WeightDiscrepancy {
 	 * If blocked, will check if correct item was added/removed using setBlocked
 	 * Will unblock if weight change fixes the weight discrepancy
 	 */
-//	@Override
-//	public void notifyMassChanged() {
-//		super.notifyMassChanged();
-//		checkDiscrepancy();
-//	}
 
 	
 	public static void setStationBlock(boolean b) {
@@ -193,7 +188,7 @@ public class WeightDiscrepancy {
 		double currentWeight = order.getTotalWeightInGrams();
 		double finalWeight = currentWeight-productWeight;
 		if (finalWeight < 0) order.addTotalWeightInGrams(0);
-		else order.addTotalWeightInGrams(finalWeight);
+		else order.addTotalWeightInGrams(-productWeight);
 		SelfCheckoutStationSoftware.setStationBlock(false);
 	}
 }
