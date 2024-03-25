@@ -218,7 +218,7 @@ public class Order {
 				BarcodedProduct productRemoved = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 
 				// Signals to the customer that the item has been removed from the order
-				System.out.println("Item " + productRemoved.getDescription() + " has been removed from the order.");
+				System.out.println("Item: " + productRemoved.getDescription() + " has been removed from the order.");
 
 				displayOrder(); // Displays the order to the customer after removal
 			}
@@ -229,6 +229,8 @@ public class Order {
 
 		return (BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1);
 	}
+	 
+
 
 	/**
 	 * Display the order to the customer one by one from the list of items in the order
@@ -244,5 +246,14 @@ public class Order {
 		}
 		System.out.println("\nTotal price: " + getTotalPrice() + "\nTotal weight: " + getTotalWeightInGrams() + " \n");
 	}
-
+	
+	/**
+	 * Checks whether the order is empty or not.
+	 * 
+	 * @return true if the order contains no items, false otherwise.
+	 */
+	public boolean isEmpty() {		// primary purpose of this method is to help in edge cases of demoIterationTwo class
+		return order.isEmpty();
+	}
+	
 }
