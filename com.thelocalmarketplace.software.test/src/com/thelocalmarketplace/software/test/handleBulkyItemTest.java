@@ -121,4 +121,27 @@ public class handleBulkyItemTest {
    		
    	}
    	
+   	@Test
+   	public void testHandleMultipleBulkyItems() throws OverloadedDevice {
+   		Order order = new Order(scale);
+   		MockItem item1 = new MockItem(new Mass(10));
+   		MockItem bulkyItem1 = new MockItem(new Mass(60));
+   		MockItem bulkyItem2 = new MockItem(new Mass(80));
+   		
+   		order.addItemToOrder(item1);;
+   		order.addTotalWeightInGrams(10);
+   		
+   		order.addItemToOrder(bulkyItem1);
+   		order.addTotalWeightInGrams(60);
+   		
+   		order.addItemToOrder(bulkyItem2);
+   		order.addTotalWeightInGrams(80);
+   		
+   		WeightDiscrepancy.handleBulkyItem(order, 60);
+   		WeightDiscrepancy.handleBulkyItem(order, 80);
+   		
+   		double expectedTotalWeight = 10;
+   		
+   		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
+   	}
 }
