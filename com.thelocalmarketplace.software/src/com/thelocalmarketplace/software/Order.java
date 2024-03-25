@@ -153,7 +153,7 @@ public class Order {
 		//Makes sure that the product that is recieved from the barcode 
 		// Is not null, therefore making sure it exists.
 		if (product != null) {
-			//Gets both the products weight and price
+			//Gets both the products price and weight
 			double productWeight = product.getExpectedWeight(); 
 			long productPrice = product.getPrice();
 

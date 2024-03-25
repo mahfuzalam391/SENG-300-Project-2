@@ -179,6 +179,7 @@ public class AddItemViaBarcodeScanTest {
 		//Creates a fake barcode 
 		Numeral[] nonExistentBarcodeDigits = {Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven, Numeral.seven};
 		Barcode nonExistentBarcode = new Barcode(nonExistentBarcodeDigits);
+		//Sets a mass to the fake barcode (fakeMass) that will be used
 		Mass fakeMass = new Mass(1000000000); 
 		barcodedItem = new BarcodedItem(nonExistentBarcode, fakeMass);
 		// Scans the fake barcode, that should not be linked to a product
