@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
@@ -40,6 +41,7 @@ import com.jjjwelectronics.scale.ElectronicScaleBronze;
 import com.jjjwelectronics.scale.ElectronicScaleGold;
 import com.jjjwelectronics.scale.ElectronicScaleSilver;
 import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
@@ -168,6 +170,10 @@ public class DemoIterationTwo {
 
             double price = 0;
 
+            BarcodedItem barcodedItem;
+            Mass mass;
+            double productWeight;
+
             label:
             while (true) {
                 // User interaction
@@ -176,6 +182,8 @@ public class DemoIterationTwo {
                 System.out.println("Enter '2' to scan Banana.");
                 itemInput = input.nextLine();
 
+
+
                 // The user chooses what item they want and the item is added to the order.
                 // The price of the item is recorded
                 switch (itemInput) {
@@ -183,10 +191,20 @@ public class DemoIterationTwo {
                         break label; // get out of the loop if the user is done with order else they can keep adding stuff
                     case "1":
                         order.addItemViaBarcodeScan(barcodeOfApple);
+
+                        productWeight = apple.getExpectedWeight();
+                        mass = new Mass(productWeight);
+                        barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
+                        scale.addAnItem(barcodedItem);
                         price += 5;
                         break;
                     case "2":
                         order.addItemViaBarcodeScan(barcodeOfBanana);
+
+                        productWeight = banana.getExpectedWeight();
+                        mass = new Mass(productWeight);
+                        barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
+                        scale.addAnItem(barcodedItem);
                         price += 3;
                         break;
                     default:
@@ -201,7 +219,9 @@ public class DemoIterationTwo {
             String removeAny = input.nextLine();
 
             if(removeAny.equalsIgnoreCase("Yes")) {
-                order.signalToRemoveItemFromOrder(input);
+                BarcodedItem removed = order.signalToRemoveItemFromOrder(input);
+                // remove from scale
+                scale.removeAnItem(removed);
             }
             PaymentHandler paymentHandler = new PaymentHandler(station, order);
             boolean breakWhileLoop = true;

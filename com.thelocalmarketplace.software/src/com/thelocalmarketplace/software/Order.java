@@ -85,8 +85,6 @@ public class Order {
 				removeTotalWeightInGrams(productWeight);
 				removeTotalPrice(productPrice);
 
-				scale.removeAnItem(item);
-
 			}
 			return true;
 		}
@@ -172,7 +170,6 @@ public class Order {
 			// Signal to the customer to place the scanned item in the bagging area
 			System.out.println("Please place item in the bagging area.");
 
-			scale.addAnItem(barcodedItem); // Adds the item to the bagging area scale
 		}
 	}
 
@@ -193,7 +190,7 @@ public class Order {
 	 * Signals that a specific item is to be removed from the order
 	 * @throws OverloadedDevice 
 	 */
-	public void signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
+	public BarcodedItem signalToRemoveItemFromOrder(Scanner scanner) throws OverloadedDevice {
 		// Signals to the customer which item they want to remove from the order
 		System.out.println("Please select the item you want to remove from the order as a number from the order list.");
 
@@ -229,6 +226,8 @@ public class Order {
 		
 		// check for weight discrepancy, then unlock the station
 		checkForDiscrepancy();
+
+		return (BarcodedItem) order.get(Integer.parseInt(itemToRemove) - 1);
 	}
 
 	/**
