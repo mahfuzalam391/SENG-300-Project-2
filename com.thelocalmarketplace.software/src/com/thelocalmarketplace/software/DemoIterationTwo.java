@@ -322,10 +322,18 @@ public class DemoIterationTwo {
                     // Handles payment with banknotes
                     case 4:
                         System.out.println("You have selected to pay with banknote.");
-                        System.out.println("You insert a $" + order.getTotalPrice() + " dollar bill.");
-                        Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(5));
+                        int numberOf5DollarBills = (int) order.getTotalPrice() / 5;
+                        int numberOf1DollarBills = (int) order.getTotalPrice() % 5;
                         ArrayList<Banknote> banknotes = new ArrayList<>();
-                        banknotes.add(banknote);
+                        for (int i=0; i < numberOf5DollarBills; i++) {
+                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(5));
+                            banknotes.add(banknote);
+                        }
+                        for (int i=0; i < numberOf1DollarBills; i++) {
+                            Banknote banknote = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(1));
+                            banknotes.add(banknote);
+                        }
+                        System.out.println("You insert " + numberOf5DollarBills + " $5 bills and " + numberOf1DollarBills + " $1 bills.");
                         if (paymentHandler.processPaymentWithBanknotes(banknotes)) {
                             System.out.println("Payment Successful!");
                         } else {
