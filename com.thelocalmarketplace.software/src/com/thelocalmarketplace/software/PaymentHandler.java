@@ -376,7 +376,7 @@ public class PaymentHandler {
 			}
 		}
 
-		BigDecimal purchaseValue = totalCost;
+		BigDecimal purchaseValue = new BigDecimal(String.valueOf(order.getTotalPrice()));
 		BigDecimal amountPaid = amountSpent;
 		BigDecimal changeDue = changeRemaining;
 

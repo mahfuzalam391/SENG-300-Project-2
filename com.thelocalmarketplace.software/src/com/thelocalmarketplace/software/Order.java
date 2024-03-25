@@ -84,6 +84,9 @@ public class Order {
 				
 				removeTotalWeightInGrams(productWeight);
 				removeTotalPrice(productPrice);
+
+				scale.removeAnItem(item);
+
 			}
 			return true;
 		}
@@ -167,6 +170,8 @@ public class Order {
 
 			// Signal to the customer to place the scanned item in the bagging area
 			System.out.println("Please place item in the bagging area.");
+
+			scale.addAnItem(barcodedItem); // Adds the item to the bagging area scale
 		}
 	}
 
