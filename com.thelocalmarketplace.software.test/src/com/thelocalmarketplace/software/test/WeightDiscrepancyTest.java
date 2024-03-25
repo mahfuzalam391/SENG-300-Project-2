@@ -213,20 +213,15 @@ public class WeightDiscrepancyTest {
 	@Test
 	public void unBlockTest() throws Exception {
 		
-		scale4 = new mockScale(new Mass (6000000), new Mass (60000000));
-        PowerGrid grid = PowerGrid.instance();
-        scale4.plugIn(grid);
-        scale4.turnOn();
-        scale4.enable();
-        order4 = new Order(scale4);
-        weightDiscrepancy4 = new WeightDiscrepancy(order4, scale4);   
+        order4 = new Order(eScale);
+        weightDiscrepancy4 = new WeightDiscrepancy(order4, eScale);   
     	
     	 MockItem item1 = new MockItem(new Mass(100));
          MockItem item2 = new MockItem(new Mass(150));
     	
          order4.addItemToOrder(item1);
          order4.addItemToOrder(item2);
-         scale4.addAnItem(item1);
+         eScale.addAnItem(item1);
           
         weightDiscrepancy4.checkIfCanUnblock();
         
@@ -243,18 +238,12 @@ public class WeightDiscrepancyTest {
 	 */
 	@Test
 	public void unBlockCatchExceptionTest() throws OverloadedDevice{
-		
-		scale4 = new mockScale(new Mass (6000000), new Mass (60000000));
-        PowerGrid grid = PowerGrid.instance();
-        scale4.plugIn(grid);
-        scale4.turnOn();
-        scale4.enable();
-        order4 = new Order(scale4);
-        weightDiscrepancy4 = new WeightDiscrepancy(order4, scale4);   
+        order4 = new Order(eScale);
+        weightDiscrepancy4 = new WeightDiscrepancy(order4, eScale);   
     	
         MockItem item2 = new MockItem(new Mass(200000000000000000L));
    
-        scale4.addAnItem(item2);
+        eScale.addAnItem(item2);
           
         weightDiscrepancy4.checkIfCanUnblock();
         assertTrue(SelfCheckoutStationSoftware.getStationBlock());    
