@@ -14,11 +14,16 @@ import com.jjjwelectronics.scale.IElectronicScale;
 
 public class AddOwnBag {
 
-	// create instance
+	/** Create an instance of the electronicscale listener that will be called when the user presses
+	 * the add own Bag button on the self checkout*/
 	private ElectronicScaleListener electronicScaleListener;
 	
 
-	
+	/** In the constructor pass in order and scale, and add any unimplemented methods 
+	 * in electronic listener 
+	 * @param order
+	 * @param scale1
+	 */
 	public AddOwnBag(Order order, AbstractElectronicScale scale1) {
 		electronicScaleListener = new ElectronicScaleListener () {
 
@@ -46,12 +51,15 @@ public class AddOwnBag {
 				
 			}
 
+			/** In this method pass in IElectronic scale and mass and we call add bag weight funtion
+			 * in add own bag, waiting for user to place bag on scale, then we can get the assoicated weight
+			 */
 			@Override
 			public void theMassOnTheScaleHasChanged(IElectronicScale scale, Mass mass) {
 				// TODO Auto-generated method stub
 				
-				double bag_grams = getBagWeight(order, scale1); //get weight of customers bags in grams 
-				addbagweight(order, scale1, bag_grams); //try to account for bag weight to prevent discrepancy 
+				double bag_grams = getBagWeight(order, scale1); 
+				addbagweight(order, scale1, bag_grams);  
 				
 			}
 
@@ -68,9 +76,18 @@ public class AddOwnBag {
 			}
 			
 		};	
+		/** print message to console that user may not add all bags **/
 		System.out.println("Add all your bags now");
 	}
 	
+	
+	/** in this method order and scale are passed in, we get the total order weight convert to a big decimal
+	 *  next we get the scale weight and we compare the order weight and the scale weight
+	 *  subtract the two values, that value will equal the bag weight, if any errors catch and print message to console, and return bag weight
+	 * @param order
+	 * @param scale
+	 * @return
+	 */
 	public double getBagWeight(Order order, AbstractElectronicScale scale) {  
 		double order_weight = order.getTotalWeightInGrams();
 		double bag_weight = 0;
@@ -90,6 +107,16 @@ public class AddOwnBag {
 		return bag_weight;
 	}
 	
+	
+	/**  in add bag weight, we pass in order, scale, and weight of bag, we first determine the mass limit
+	 * and we compare the current mass on the scale to this limit, if there is a difference 
+	 * print out bag to heavy and block the station, we then call attendant to deal with the problem, the attendant will fix it 
+	 * next if there is no difference, we set station block to false add weight to order and print you may now continue
+	 * if any exceptions are called catch and print message
+	 * @param order
+	 * @param scale
+	 * @param weight_of_bag
+	 */
 	// now that customer has signaled they want to add their own bags, pass in the weight of their own bags
 	public void addbagweight(Order order, AbstractElectronicScale scale, double weight_of_bag) {
 		

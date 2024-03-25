@@ -226,8 +226,6 @@ public class WeightDiscrepancyTest {
       
         order5 = new Order(scale5);
      
-		
-   
         weightDiscrepancy4 = new WeightDiscrepancy(order5, scale5);   
     	
     	 MockItem item1 = new MockItem(new Mass(100));
