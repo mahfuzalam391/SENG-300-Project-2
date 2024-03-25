@@ -542,6 +542,10 @@ public class WeightDiscrepancyTest {
    		assertEquals(expectedTotalWeight, order.getTotalWeightInGrams(), 0);
    	}
    	
+   	/*
+   	 * Create a test to verify station block with a order-scale mismatch
+   	 */
+   	
    	@Test
    	public void testHandleBulkyItem_removeWrongWeight() throws OverloadedDevice {
    		Order order = new Order(eScale);
