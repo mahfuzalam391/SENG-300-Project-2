@@ -451,6 +451,11 @@ public class PaymentHandler {
 	 */
 	public int payWithCreditViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException {
 		try {
+			if (SelfCheckoutStationSoftware.getStationBlock()) {
+				System.out.println("Blocked. Please add your item to the bagging area.");
+				return -1;
+			}
+
 			AbstractCardReader cardReader = null;
 
 			if (checkoutSystem instanceof SelfCheckoutStationBronze) {
@@ -503,6 +508,11 @@ public class PaymentHandler {
 	 */
 	public int payWithDebitViaSwipe(Card card, double amountCharged, CardIssuer cardIssuer) throws IOException {
 		try {
+			if (SelfCheckoutStationSoftware.getStationBlock()) {
+				System.out.println("Blocked. Please add your item to the bagging area.");
+				return -1;
+			}
+
 			AbstractCardReader cardReader = null;
 
 			if (checkoutSystem instanceof SelfCheckoutStationBronze) {
