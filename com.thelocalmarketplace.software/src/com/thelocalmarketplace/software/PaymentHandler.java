@@ -159,6 +159,21 @@ public class PaymentHandler {
 		}
 	}
 
+
+
+	/**
+	 * Processes payment using banknotes. This method accepts a list of {@link Banknote} objects representing the banknotes inserted by the user, validates them, and then attempts to use them to complete a transaction. The method checks if the self-checkout station is blocked, validates the list of banknotes for nullity, accumulates the total value of accepted banknotes, and compares it against the total price of the transaction. If the total value is sufficient, it attempts to dispense the change. If the change cannot be accurately dispensed, or if the total value is insufficient, the payment is considered unsuccessful.
+	 *
+	 * @param Banknotes the list of banknotes inserted by the user to process the payment. This list should not be null.
+	 * @return {@code true} if the payment was successfully processed and any necessary change was dispensed accurately; {@code false} otherwise, including when the station is blocked, when not enough value has been inserted, or when accurate change cannot be dispensed.
+	 * @throws DisabledException if the payment processing device is disabled.
+	 * @throws CashOverloadException if accepting the banknotes would overload the cash storage.
+	 * @throws NoCashAvailableException if there is no cash available in the machine to dispense change.
+	 * @throws EmptyDevice if the device that accepts or dispenses banknotes is empty.
+	 * @throws OverloadedDevice if the device that accepts or dispenses banknotes is overloaded.
+	 * @throws NullPointerException if the {@code Banknotes} parameter is null.
+	 */
+	
 	public boolean processPaymentWithBanknotes(ArrayList<Banknote> Banknotes)
 			throws DisabledException, CashOverloadException, NoCashAvailableException, EmptyDevice, OverloadedDevice {
 
