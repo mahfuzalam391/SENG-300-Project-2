@@ -193,7 +193,6 @@ public class DemoIterationTwo {
             	}
 
                 itemInput = input.nextLine();		// Prompts for user input
-                BarcodedItem itemGot;
                
                 // The user chooses what item they want and the item is added to the order.
                 // The price of the item is recorded
@@ -209,12 +208,12 @@ public class DemoIterationTwo {
                         }
 
                     case "1":
-                        itemGot = order.addItemViaBarcodeScan(barcodeOfApple);
-                        scale.addAnItem(itemGot);
+                        barcodedItem = order.addItemViaBarcodeScan(barcodeOfApple);
+                        scale.addAnItem(barcodedItem);
                         break;
                     case "2":
-                        itemGot = order.addItemViaBarcodeScan(barcodeOfBanana);
-                        scale.addAnItem(itemGot);
+                        barcodedItem = order.addItemViaBarcodeScan(barcodeOfBanana);
+                        scale.addAnItem(barcodedItem);
                         break;
                     default:
                         System.out.println("Unable to process input. Please try again.");    // again prompts for adding a produce to the order cart
@@ -227,8 +226,9 @@ public class DemoIterationTwo {
             String removeAny = input.nextLine();
 
             if(removeAny.equalsIgnoreCase("Yes")) {
-                BarcodedItem removed = order.signalToRemoveItemFromOrder(input);
-                scale.removeAnItem(removed);
+                barcodedItem = order.signalToRemoveItemFromOrder(input);
+                scale.removeAnItem(barcodedItem);
+                order.checkForDiscrepancy();
             }
             
             PaymentHandler paymentHandler = new PaymentHandler(station, order);
