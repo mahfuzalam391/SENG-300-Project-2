@@ -499,7 +499,7 @@ public class PaymentHandler {
 				System.out.println("The transaction failed. Please try again.");
 				return -1;
 			}
-			order.removeTotalPrice((long) amountCharged); // Update the total amount due to the customer
+			totalPrice = BigDecimal.ZERO; // Update the total amount due to the customer
 			amountSpent = BigDecimal.valueOf(amountCharged);
 			changeRemaining = BigDecimal.ZERO;
 			// Receipt printing is handled inside the demo
@@ -556,7 +556,7 @@ public class PaymentHandler {
 				System.out.println("The transaction failed. Please try again.");
 				return -1;
 			}
-			order.removeTotalPrice((long) amountCharged); // Update the total amount due to the customer
+			totalPrice = BigDecimal.ZERO; // Update the total amount due to the customer
 			amountSpent = BigDecimal.valueOf(amountCharged);
 			changeRemaining = BigDecimal.ZERO;
 			return 1;
