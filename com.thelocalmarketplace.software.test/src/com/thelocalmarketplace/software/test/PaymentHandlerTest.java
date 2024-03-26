@@ -1700,4 +1700,44 @@ public class PaymentHandlerTest {
     	assertEquals(actualResultS, expectedResult);
     	assertEquals(actualResultB, expectedResult);
     }
+    
+    @Test
+    public void testPayWithCreditViaSwipeBlocked() throws IOException {
+    	Card creditCard = new Card("Credit", "21", "Holder1", "211");
+        CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData(creditCard.number, creditCard.cardholder, expiry, creditCard.cvv, 2000);
+        int amountCharged = 1;
+        int expectedResult = -1;    	
+        
+        boolean previousState = SelfCheckoutStationSoftware.getStationBlock();
+        SelfCheckoutStationSoftware.setStationBlock(true);
+        
+    	assertEquals(paymentHandlerG.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
+    	assertEquals(paymentHandlerS.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
+    	assertEquals(paymentHandlerB.payWithCreditViaSwipe(creditCard, amountCharged, cardIssuer), expectedResult);
+    	
+    	SelfCheckoutStationSoftware.setStationBlock(previousState);
+    }
+    
+    @Test
+    public void testPayWithDebitViaSwipeBlocked() throws IOException {
+    	Card debitCard = new Card("Debit", "12", "Holder2", "122");
+    	CardIssuer cardIssuer = new CardIssuer("Seng300 Bank", 10);
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.YEAR, 5);
+        cardIssuer.addCardData(debitCard.number, debitCard.cardholder, expiry, debitCard.cvv, 2000);
+        int amountCharged = 1;
+        int expectedResult = -1;    	
+        
+        boolean previousState = SelfCheckoutStationSoftware.getStationBlock();
+        SelfCheckoutStationSoftware.setStationBlock(true);
+        
+    	assertEquals(paymentHandlerG.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
+    	assertEquals(paymentHandlerS.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
+    	assertEquals(paymentHandlerB.payWithDebitViaSwipe(debitCard, amountCharged, cardIssuer), expectedResult);
+    	
+    	SelfCheckoutStationSoftware.setStationBlock(previousState);
+    }
 }
