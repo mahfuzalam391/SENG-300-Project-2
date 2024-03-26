@@ -193,45 +193,33 @@ public class DemoIterationTwo {
             	}
 
                 itemInput = input.nextLine();		// Prompts for user input
-
+                BarcodedItem itemGot;
                
                 // The user chooses what item they want and the item is added to the order.
                 // The price of the item is recorded
                 switch (itemInput) {
                     case "0":
-                    	if (!order.isEmpty()) { // checks if the order list is not empty if thats the case it will ask for payment option as well
-                    		break label;  // get out of the loop if the user is done with order else they can keep adding stuff
-                    	}
-                    	
-                    	else {
-                    		// Assuming we are on the first cycle of the order, and user hits 0, when the only options prompted are to add an item
-                    		// then, we can use condition to separate this case
-                    		System.out.println("Unable to process input. Please try again.");
-                    		break;
-                    	}
-                         
-                    case "1":
-                        order.addItemViaBarcodeScan(barcodeOfApple);
+                        if (!order.isEmpty()) { // checks if the order list is not empty if thats the case it will ask for payment option as well
+                            break label;  // get out of the loop if the user is done with order else they can keep adding stuff
+                        } else {
+                            // Assuming we are on the first cycle of the order, and user hits 0, when the only options prompted are to add an item
+                            // then, we can use condition to separate this case
+                            System.out.println("Unable to process input. Please try again.");
+                            break;
+                        }
 
-                        productWeight = apple.getExpectedWeight();
-                        mass = new Mass(productWeight);
-                        barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
-                        scale.addAnItem(barcodedItem);
+                    case "1":
+                        itemGot = order.addItemViaBarcodeScan(barcodeOfApple);
+                        scale.addAnItem(itemGot);
                         break;
                     case "2":
-                        order.addItemViaBarcodeScan(barcodeOfBanana);
-
-                        productWeight = banana.getExpectedWeight();
-                        mass = new Mass(productWeight);
-                        barcodedItem = new BarcodedItem(barcodeOfApple, mass); // Adds the product to the order
-                        scale.addAnItem(barcodedItem);
+                        itemGot = order.addItemViaBarcodeScan(barcodeOfBanana);
+                        scale.addAnItem(itemGot);
                         break;
                     default:
-                        System.out.println("Unable to process input. Please try again.");	// again prompts for adding a produce to the order cart
+                        System.out.println("Unable to process input. Please try again.");    // again prompts for adding a produce to the order cart
                         break;
                 }
-                
-
                 order.displayOrder();
             }
 
@@ -240,16 +228,7 @@ public class DemoIterationTwo {
 
             if(removeAny.equalsIgnoreCase("Yes")) {
                 BarcodedItem removed = order.signalToRemoveItemFromOrder(input);
-                
-                // remove from scale
-                scale.removeAnItem(removed);		// error in this line
-                // when you add an item and then remove the item, the item does get removed from the order list but throws different error
-                // Sometimes index out of bound or sometimes 
-                //Failed to initialize order: The item was not found amongst those on the scale.
-//                ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException: The item was not found amongst those on the scale.
-//            	at com.jjjwelectronics.scale.AbstractElectronicScale.removeAnItem(AbstractElectronicScale.java:94)
-//            	at com.thelocalmarketplace.software.DemoIterationTwo.main(DemoIterationTwo.java:248)
-               
+                scale.removeAnItem(removed);
             }
             
             PaymentHandler paymentHandler = new PaymentHandler(station, order);
