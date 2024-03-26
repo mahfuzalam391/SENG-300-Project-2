@@ -146,7 +146,7 @@ public class Order {
 	 * Adds an item to the order via barcode scan
 	 * Accounting for Bronze, Silver and Gold checkout Stations
 	 */
-	public void addItemViaBarcodeScan(Barcode barcode) {
+	public BarcodedItem addItemViaBarcodeScan(Barcode barcode) {
 		// Gets the product from the hardware's database
 		// All the barcodes are accepted from the bronze, silver and gold
 		BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
@@ -171,6 +171,7 @@ public class Order {
 			System.out.println("Please place item in the bagging area.");
 
 		}
+		return barcodedItem;
 	}
 
 	/**

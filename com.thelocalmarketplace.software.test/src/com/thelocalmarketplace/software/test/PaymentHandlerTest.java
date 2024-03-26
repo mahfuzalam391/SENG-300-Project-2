@@ -78,7 +78,7 @@ public class PaymentHandlerTest {
     private ArrayList<Product> coinsList;
     private Coin coin1, coin2;
     private Banknote banknote1, banknote2;
-    private BigDecimal totalCost;
+    private BigDecimal totalPrice;
     private PaymentHandler paymentHandlerG;
     private PaymentHandler paymentHandlerS;
     private PaymentHandler paymentHandlerB;
@@ -571,12 +571,6 @@ public class PaymentHandlerTest {
         assertEquals(paymentHandlerB.getChangeRemaining(), BigDecimal.ZERO);
     }
     
-    @Test
-    public void getTotalCostTest() {
-    	assertEquals(paymentHandlerG.getTotalCost(), BigDecimal.valueOf(productPrice));
-    	assertEquals(paymentHandlerS.getTotalCost(), BigDecimal.valueOf(productPrice));
-    	assertEquals(paymentHandlerB.getTotalCost(), BigDecimal.valueOf(productPrice));
-    }
 
     @Test
     public void processPaymentWithCoinsTestWithOverpayment() throws Exception { //there is a probelm here
@@ -584,15 +578,15 @@ public class PaymentHandlerTest {
         Currency currency = Currency.getInstance("CAD");
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("0.25");
+        paymentHandlerG.totalPrice = new BigDecimal("0.25");
         
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("0.25");
+        paymentHandlerS.totalPrice = new BigDecimal("0.25");
         
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("0.25");
+        paymentHandlerB.totalPrice = new BigDecimal("0.25");
 
         ArrayList<Coin> coinsList = new ArrayList<Coin>();
 
@@ -628,15 +622,15 @@ public class PaymentHandlerTest {
         Currency currency = Currency.getInstance("CAD");
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("0.25");
+        paymentHandlerG.totalPrice = new BigDecimal("0.25");
         
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("0.25");
+        paymentHandlerS.totalPrice = new BigDecimal("0.25");
         
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("0.25");
+        paymentHandlerB.totalPrice = new BigDecimal("0.25");
 
         ArrayList<Coin> coinsList = new ArrayList<Coin>();
 
@@ -706,9 +700,9 @@ public class PaymentHandlerTest {
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
         
-        paymentHandlerG.totalCost = new BigDecimal("12.0");
-        paymentHandlerS.totalCost = new BigDecimal("12.0");
-        paymentHandlerB.totalCost = new BigDecimal("12.0");
+        paymentHandlerG.totalPrice = new BigDecimal("12.0");
+        paymentHandlerS.totalPrice = new BigDecimal("12.0");
+        paymentHandlerB.totalPrice = new BigDecimal("12.0");
 
         assertTrue("Payment should succeed with exact amount", paymentHandlerG.processPaymentWithCoins(coinsList));
         assertTrue("Payment should succeed with exact amount", paymentHandlerS.processPaymentWithCoins(coinsList));
@@ -734,9 +728,9 @@ public class PaymentHandlerTest {
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
         
-        paymentHandlerG.totalCost = new BigDecimal("12.0");
-        paymentHandlerS.totalCost = new BigDecimal("12.0");
-        paymentHandlerB.totalCost = new BigDecimal("12.0");
+        paymentHandlerG.totalPrice = new BigDecimal("12.0");
+        paymentHandlerS.totalPrice = new BigDecimal("12.0");
+        paymentHandlerB.totalPrice = new BigDecimal("12.0");
 
         assertFalse(paymentHandlerG.processPaymentWithCoins(coinsList));
         assertFalse(paymentHandlerS.processPaymentWithCoins(coinsList));
@@ -1149,17 +1143,17 @@ public class PaymentHandlerTest {
         paymentHandlerG = new PaymentHandler(checkoutStationG, testOrder);
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("20.0");
+        paymentHandlerG.totalPrice = new BigDecimal("20.0");
         
         paymentHandlerS = new PaymentHandler(checkoutStationS, testOrder);
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("20.0");
+        paymentHandlerS.totalPrice = new BigDecimal("20.0");
         
         paymentHandlerB = new PaymentHandler(checkoutStationB, testOrder);
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("20.0");
+        paymentHandlerB.totalPrice = new BigDecimal("20.0");
 
         ArrayList<Banknote> notesList = new ArrayList<Banknote>();
 
@@ -1194,13 +1188,13 @@ public class PaymentHandlerTest {
 
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("20.0");
+        paymentHandlerG.totalPrice = new BigDecimal("20.0");
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("20.0");
+        paymentHandlerS.totalPrice = new BigDecimal("20.0");
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("20.0");
+        paymentHandlerB.totalPrice = new BigDecimal("20.0");
 
         ArrayList<Banknote> notesList = new ArrayList<Banknote>();
 
@@ -1231,13 +1225,13 @@ public class PaymentHandlerTest {
 
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("15.0");
+        paymentHandlerG.totalPrice = new BigDecimal("15.0");
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("15.0");
+        paymentHandlerS.totalPrice = new BigDecimal("15.0");
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("15.0");
+        paymentHandlerB.totalPrice = new BigDecimal("15.0");
 
 
         ArrayList<Banknote> notesList = new ArrayList<Banknote>();
@@ -1268,15 +1262,15 @@ public class PaymentHandlerTest {
 
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("15.0");
+        paymentHandlerG.totalPrice = new BigDecimal("15.0");
         
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("15.0");
+        paymentHandlerS.totalPrice = new BigDecimal("15.0");
         
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("15.0");
+        paymentHandlerB.totalPrice = new BigDecimal("15.0");
 
         ArrayList<Banknote> notesList = new ArrayList<Banknote>();
 
@@ -1306,15 +1300,15 @@ public class PaymentHandlerTest {
 
         checkoutStationG.plugIn(PowerGrid.instance());
         checkoutStationG.turnOn();
-        paymentHandlerG.totalCost = new BigDecimal("15.0");
+        paymentHandlerG.totalPrice = new BigDecimal("15.0");
         
         checkoutStationS.plugIn(PowerGrid.instance());
         checkoutStationS.turnOn();
-        paymentHandlerS.totalCost = new BigDecimal("15.0");
+        paymentHandlerS.totalPrice = new BigDecimal("15.0");
         
         checkoutStationB.plugIn(PowerGrid.instance());
         checkoutStationB.turnOn();
-        paymentHandlerB.totalCost = new BigDecimal("15.0");
+        paymentHandlerB.totalPrice = new BigDecimal("15.0");
 
         ArrayList<Banknote> notesList = new ArrayList<Banknote>();
 
